@@ -1,0 +1,61 @@
+version: 1
+approval: CCA requested 2026-10-11; established reading-only scope
+course:
+  id: ATS059
+  certification:
+    name: Cilium Certified Associate
+    code: CCA
+    provider: CNCF / Linux Foundation
+    domain: BGP and External Networking
+    weight: 6
+    competencies:
+    - Egress Connectivity Requirements
+    - Understand Options to Connect Cilium-managed Clusters with External Networks
+defaults:
+  playground: false
+  module_lab: false
+  capstone: false
+  section_quiz: false
+  final_quiz: true
+assessment_format: YAML question banks v1, registered in assessments/index.yaml
+sections:
+- id: section-010
+  title: Egress Connectivity Requirements
+  curriculum_item: Egress Connectivity Requirements
+  capstone: false
+  section_quiz: false
+  modules:
+  - id: module-01
+    title: External Egress, Source Identity And Return Paths
+    objectives:
+    - Trace outbound discovery, routing, policy and application trust.
+    - Explain masquerading and predictable egress identity.
+    - Distinguish egress gateway behavior from network authorization.
+    - Evaluate return paths, exclusions and failure scope.
+    outline:
+    - External Egress, Source Identity And Return Paths
+    playground: false
+    module_lab: false
+    sources:
+    - reading: sections/section-010/module-01/course-01-external-egress-source-identity-and-return-paths.md
+      adapted_from: null
+- id: section-020
+  title: Understand Options to Connect Cilium-managed Clusters with External Networks
+  curriculum_item: Understand Options to Connect Cilium-managed Clusters with External Networks
+  capstone: false
+  section_quiz: false
+  modules:
+  - id: module-01
+    title: BGP Route Advertisement And External Connectivity
+    objectives:
+    - Explain peer sessions and advertised prefixes.
+    - Distinguish BGP control-plane state from packet forwarding.
+    - Compare route advertisement with address allocation and Layer 2 announcement.
+    - Evaluate next hops, return paths and infrastructure policy.
+    outline:
+    - BGP Route Advertisement And External Connectivity
+    playground: false
+    module_lab: false
+    sources:
+    - reading: sections/section-020/module-01/course-01-bgp-route-advertisement-and-external-connectivity.md
+      adapted_from: null
