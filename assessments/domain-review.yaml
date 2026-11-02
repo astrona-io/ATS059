@@ -1,0 +1,129 @@
+schema_version: 1
+kind: question_bank
+id: ats059-domain-review
+course_id: ATS059
+exam_code: CCA
+status: draft
+provenance: Original practice material; not official examination questions.
+scope:
+  type: domain
+  id: domain-review
+  title: BGP and External Networking
+placement:
+  position: after
+  reading: sections/section-020/module-01/course-02-summary.md
+questions:
+- id: ats059-domain-review-q01
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Trace outbound discovery, routing, policy and application trust.
+  source_readings:
+  - sections/section-010/module-01/course-01-external-egress-source-identity-and-return-paths.md
+  prompt: What is needed beyond an egress allow rule?
+  options:
+  - id: a
+    text: Discovery, routes, a return path and a usable destination.
+    explanation: Permission does not create all connectivity dependencies.
+  - id: b
+    text: Nothing; an allow creates every route.
+    explanation: Routing is separate.
+  - id: c
+    text: Only a dashboard screenshot.
+    explanation: Presentation does not provide transport.
+  correct_option: a
+  explanation: Permission does not create all connectivity dependencies.
+- id: ats059-domain-review-q02
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Explain masquerading and predictable egress identity.
+  source_readings:
+  - sections/section-010/module-01/course-01-external-egress-source-identity-and-return-paths.md
+  prompt: Why can an external service see a node address?
+  options:
+  - id: a
+    text: Every Pod permanently shares one IP by definition.
+    explanation: Translation and allocation are different.
+  - id: b
+    text: NetworkPolicy renames the server's certificate automatically.
+    explanation: Policy does not perform that identity change.
+  - id: c
+    text: Source masquerading or another translation can change the visible source.
+    explanation: External allowlists need the actual path identity.
+  correct_option: c
+  explanation: External allowlists need the actual path identity.
+- id: ats059-domain-review-q03
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Distinguish egress gateway behavior from network authorization.
+  source_readings:
+  - sections/section-010/module-01/course-01-external-egress-source-identity-and-return-paths.md
+  prompt: What does an egress gateway principally contribute?
+  options:
+  - id: a
+    text: Universal backup of the external database.
+    explanation: Data management is unrelated.
+  - id: b
+    text: A supported selected path and source identity for outbound traffic.
+    explanation: It can help external systems use predictable source addresses.
+  - id: c
+    text: Automatic permission to every internet destination.
+    explanation: Policy remains a separate boundary.
+  correct_option: b
+  explanation: It can help external systems use predictable source addresses.
+- id: ats059-domain-review-q04
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Explain peer sessions and advertised prefixes.
+  source_readings:
+  - sections/section-020/module-01/course-01-bgp-route-advertisement-and-external-connectivity.md
+  prompt: What does BGP exchange?
+  options:
+  - id: a
+    text: Route reachability information.
+    explanation: It is a routing control protocol.
+  - id: b
+    text: Every application payload as a proxy.
+    explanation: Application traffic follows a data path.
+  - id: c
+    text: Kubernetes Secret values automatically.
+    explanation: Credential distribution is not its purpose.
+  correct_option: a
+  explanation: It is a routing control protocol.
+- id: ats059-domain-review-q05
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Distinguish BGP control-plane state from packet forwarding.
+  source_readings:
+  - sections/section-020/module-01/course-01-bgp-route-advertisement-and-external-connectivity.md
+  prompt: Does an established BGP session prove a Service works externally?
+  options:
+  - id: a
+    text: Yes; every possible prefix is advertised automatically.
+    explanation: Advertisement policy selects prefixes.
+  - id: b
+    text: Yes; every backend becomes ready.
+    explanation: Application readiness is separate.
+  - id: c
+    text: No; advertisement, route installation and forwarding still need evidence.
+    explanation: A session is only one stage.
+  correct_option: c
+  explanation: A session is only one stage.
+- id: ats059-domain-review-q06
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Compare route advertisement with address allocation and Layer 2 announcement.
+  source_readings:
+  - sections/section-020/module-01/course-01-bgp-route-advertisement-and-external-connectivity.md
+  prompt: What does Cilium's BGP control plane not itself replace?
+  options:
+  - id: a
+    text: The need to decide advertised prefixes.
+    explanation: Selection is part of the control contract.
+  - id: b
+    text: The actual packet-forwarding path.
+    explanation: It advertises routes rather than serving as a universal traffic proxy.
+  - id: c
+    text: The need to configure peer relationships.
+    explanation: Those relationships remain inputs.
+  correct_option: b
+  explanation: It advertises routes rather than serving as a universal traffic proxy.
