@@ -32,7 +32,7 @@ modules:
 - id: module-010
   title: Egress Connectivity Requirements
   description: Developed reading and reasoning for Egress Connectivity Requirements.
-  status: alpha
+  maturity: alpha
   content:
   - type: reading
     title: Egress Connectivity Requirements
@@ -71,7 +71,7 @@ modules:
   title: Understand Options to Connect Cilium-managed Clusters with External Networks
   description: Developed reading and reasoning for Understand Options to Connect Cilium-managed
     Clusters with External Networks.
-  status: alpha
+  maturity: alpha
   content:
   - type: reading
     title: Understand Options to Connect Cilium-managed Clusters with External Networks
