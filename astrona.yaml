@@ -1,9 +1,8 @@
-# Reading-only content; YAML knowledge checks have a separate index.
 training:
   id: ATS059
   title: 'CCA: BGP and External Networking'
-  description: 'Detailed reading material and reusable YAML knowledge checks for CCA: BGP and External
-    Networking. Technical content remains draft. No labs or playgrounds.'
+  description: 'Detailed reading material and reusable YAML knowledge checks for CCA:
+    BGP and External Networking. Technical content remains draft. Private playgrounds and draft independent labs are included.'
   certification:
     name: Cilium Certified Associate
     code: CCA
@@ -33,7 +32,7 @@ modules:
 - id: module-010
   title: Egress Connectivity Requirements
   description: Developed reading and reasoning for Egress Connectivity Requirements.
-  draft: true
+  status: alpha
   content:
   - type: reading
     title: Egress Connectivity Requirements
@@ -45,13 +44,34 @@ modules:
     title: External Egress, Source Identity And Return Paths
     path: sections/section-010/module-01/course-01-external-egress-source-identity-and-return-paths.md
   - type: reading
+    title: Inspect Egress Source And Node Allocation — Task
+    path: sections/section-010/module-01/labs/lab-01/question.md
+  - type: lab
+    title: Inspect Egress Source And Node Allocation
+    path: sections/section-010/module-01/labs/lab-01
+    difficulty: intermediate
+    estimated_duration: 25m
+    topic: cilium-diagnostics
+    task_kind: build
+    learning_goals:
+    - Record source addressing and the enabled control-plane baseline.
+    tags:
+    - cca
+    - cilium-diagnostics
+  - type: reading
+    title: Inspect Egress Source And Node Allocation — Solution
+    path: sections/section-010/module-01/labs/lab-01/solution.md
+  - type: reading
+    title: 'Guided Practice: Inspect Egress Source And Node Allocation'
+    path: sections/section-010/module-01/course-02-guided-practice.md
+  - type: reading
     title: Summary
-    path: sections/section-010/module-01/course-02-summary.md
+    path: sections/section-010/module-01/course-03-summary.md
 - id: module-020
   title: Understand Options to Connect Cilium-managed Clusters with External Networks
-  description: Developed reading and reasoning for Understand Options to Connect Cilium-managed Clusters
-    with External Networks.
-  draft: true
+  description: Developed reading and reasoning for Understand Options to Connect Cilium-managed
+    Clusters with External Networks.
+  status: alpha
   content:
   - type: reading
     title: Understand Options to Connect Cilium-managed Clusters with External Networks
@@ -63,5 +83,26 @@ modules:
     title: BGP Route Advertisement And External Connectivity
     path: sections/section-020/module-01/course-01-bgp-route-advertisement-and-external-connectivity.md
   - type: reading
+    title: Inspect BGP Control Plane Readiness — Task
+    path: sections/section-020/module-01/labs/lab-01/question.md
+  - type: lab
+    title: Inspect BGP Control Plane Readiness
+    path: sections/section-020/module-01/labs/lab-01
+    difficulty: intermediate
+    estimated_duration: 25m
+    topic: cilium-diagnostics
+    task_kind: build
+    learning_goals:
+    - Record source addressing and the enabled control-plane baseline.
+    tags:
+    - cca
+    - cilium-diagnostics
+  - type: reading
+    title: Inspect BGP Control Plane Readiness — Solution
+    path: sections/section-020/module-01/labs/lab-01/solution.md
+  - type: reading
+    title: 'Guided Practice: Inspect BGP Control Plane Readiness'
+    path: sections/section-020/module-01/course-02-guided-practice.md
+  - type: reading
     title: Summary
-    path: sections/section-020/module-01/course-02-summary.md
+    path: sections/section-020/module-01/course-03-summary.md
