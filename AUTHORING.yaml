@@ -43,6 +43,8 @@ sections:
       adapted_from: 
     - reading: sections/section-010/module-01/course-03-source-identity-and-return-paths.md
       adapted_from: 
+    - reading: sections/section-010/module-01/course-04-rolling-out-egress-policy-safely.md
+      adapted_from: 
     labs:
     - id: lab-01
       path: sections/section-010/module-01/labs/lab-01
@@ -66,6 +68,8 @@ sections:
       adapted_from: 
     - reading: sections/section-010/module-02/course-03-gateway-policy-failures-and-network-policy.md
       adapted_from: 
+    - reading: sections/section-010/module-02/course-04-fixed-address-alternatives-and-trade-offs.md
+      adapted_from: 
     labs:
     - id: lab-01
       path: sections/section-010/module-02/labs/lab-01
@@ -74,6 +78,60 @@ sections:
       status: draft
       runtime_verification: pending
     practice_readings: []
+  - id: module-03
+    title: Allow External Services By Name And Entity
+    objectives:
+    - Explain how the DNS proxy links names to addresses.
+    - Write toFQDNs rules with matchName and matchPattern.
+    - Use entities, services and endpoints as destinations.
+    - Diagnose a name-based rule with the FQDN cache and flows.
+    playground: true
+    module_lab: true
+    sources:
+    - reading: sections/section-010/module-03/course-01-how-a-fqdn-rule-works.md
+      adapted_from: 
+    - reading: sections/section-010/module-03/course-02-matching-names-and-ttl.md
+      adapted_from: 
+    - reading: sections/section-010/module-03/course-03-entities-services-and-endpoints.md
+      adapted_from: 
+    - reading: sections/section-010/module-03/course-04-inspecting-and-diagnosing-name-based-policy.md
+      adapted_from: 
+    labs:
+    - id: lab-01
+      path: sections/section-010/module-03/labs/lab-01
+      after_reading: sections/section-010/module-03/course-01-how-a-fqdn-rule-works.md
+      objective: Allow one partner by name with a DNS rule and a toFQDNs rule.
+      status: draft
+      runtime_verification: pending
+    practice_readings: []
+    quiz: sections/section-010/module-03/quiz.yaml
+  - id: module-04
+    title: Operate The Egress Gateway
+    objectives:
+    - Check the requirements and the state of the egress gateway.
+    - Choose gateway nodes and egress addresses.
+    - Design policies that select the right pods and destinations.
+    - Move the gateway to another node in a safe order.
+    playground: true
+    module_lab: true
+    sources:
+    - reading: sections/section-010/module-04/course-01-requirements-and-feature-checks.md
+      adapted_from: 
+    - reading: sections/section-010/module-04/course-02-gateway-nodes-and-addresses.md
+      adapted_from: 
+    - reading: sections/section-010/module-04/course-03-policy-design.md
+      adapted_from: 
+    - reading: sections/section-010/module-04/course-04-changing-the-gateway.md
+      adapted_from: 
+    labs:
+    - id: lab-01
+      path: sections/section-010/module-04/labs/lab-01
+      after_reading: sections/section-010/module-04/course-01-requirements-and-feature-checks.md
+      objective: Move the gateway for one pod to the second worker with a role label.
+      status: draft
+      runtime_verification: pending
+    practice_readings: []
+    quiz: sections/section-010/module-04/quiz.yaml
   capstone_lab: sections/section-010/capstone/labs/lab-01
   quiz: sections/section-010/quiz.yaml
 - id: section-020
@@ -98,6 +156,8 @@ sections:
       adapted_from: 
     - reading: sections/section-020/module-01/course-03-bringing-up-a-peering-session.md
       adapted_from: 
+    - reading: sections/section-020/module-01/course-04-peering-design-choices.md
+      adapted_from: 
     labs:
     - id: lab-01
       path: sections/section-020/module-01/labs/lab-01
@@ -121,6 +181,8 @@ sections:
       adapted_from: 
     - reading: sections/section-020/module-02/course-03-connection-options-and-failures.md
       adapted_from: 
+    - reading: sections/section-020/module-02/course-04-traffic-into-the-cluster.md
+      adapted_from: 
     labs:
     - id: lab-01
       path: sections/section-020/module-02/labs/lab-01
@@ -129,6 +191,61 @@ sections:
       status: draft
       runtime_verification: pending
     practice_readings: []
+  - id: module-03
+    title: Announce Service Addresses Without BGP
+    objectives:
+    - Explain Layer 2 announcements.
+    - Write a CiliumL2AnnouncementPolicy.
+    - Read leases and explain failover and limits.
+    - Explain Node IPAM and choose between BGP, Layer 2 and Node IPAM.
+    playground: true
+    module_lab: true
+    sources:
+    - reading: sections/section-020/module-03/course-01-layer-2-announcements.md
+      adapted_from: 
+    - reading: sections/section-020/module-03/course-02-the-announcement-policy.md
+      adapted_from: 
+    - reading: sections/section-020/module-03/course-03-leases-failover-and-limits.md
+      adapted_from: 
+    - reading: sections/section-020/module-03/course-04-node-ipam-and-choosing-an-option.md
+      adapted_from: 
+    labs:
+    - id: lab-01
+      path: sections/section-020/module-03/labs/lab-01
+      after_reading: sections/section-020/module-03/course-01-layer-2-announcements.md
+      objective: Announce a LoadBalancer Service with Layer 2 from worker nodes.
+      status: draft
+      runtime_verification: pending
+    practice_readings: []
+    quiz: sections/section-020/module-03/quiz.yaml
+  - id: module-04
+    title: Operate And Troubleshoot BGP
+    objectives:
+    - Inspect sessions and routes on the node and on the router.
+    - Set communities and local preference in an advertisement.
+    - Follow a fixed order of checks for a missing session or route.
+    - Map the older peering policy to the current resources.
+    playground: true
+    module_lab: true
+    sources:
+    - reading: sections/section-020/module-04/course-01-inspecting-sessions-and-routes.md
+      adapted_from: 
+    - reading: sections/section-020/module-04/course-02-route-attributes-communities-and-preference.md
+      adapted_from: 
+    - reading: sections/section-020/module-04/course-03-troubleshooting-a-route-that-does-not-arrive.md
+      adapted_from: 
+    - reading: sections/section-020/module-04/course-04-older-resources-and-pod-address-pools.md
+      adapted_from: 
+    labs:
+    - id: lab-01
+      path: sections/section-020/module-04/labs/lab-01
+      after_reading: sections/section-020/module-04/course-01-inspecting-sessions-and-routes.md
+      objective: Fix the advertisement chain and add a community, verified on the
+        router.
+      status: draft
+      runtime_verification: pending
+    practice_readings: []
+    quiz: sections/section-020/module-04/quiz.yaml
   capstone_lab: sections/section-020/capstone/labs/lab-01
   quiz: sections/section-020/quiz.yaml
 final_quiz: sections/final-domain-quiz.yaml

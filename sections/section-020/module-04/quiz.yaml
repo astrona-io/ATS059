@@ -1,0 +1,216 @@
+schema_version: 1
+kind: question_bank
+id: ats059-020-04
+course_id: ATS059
+exam_code: CCA
+status: draft
+provenance: Original practice material written for this course; not official exam
+  questions.
+scope:
+  type: module
+  id: module-04
+  title: Operate And Troubleshoot BGP
+placement:
+  position: after
+  reading: section-020/module-04/course-05-summary.md
+questions:
+- id: ats059-020-04-q01
+  type: single_choice
+  difficulty: beginner
+  learning_objective: Read the session state
+  source_readings:
+  - sections/section-020/module-04/course-01-inspecting-sessions-and-routes.md
+  prompt: Which command lists the BGP sessions of all nodes with their state?
+  options:
+  - id: a
+    text: "`cilium bgp peers`."
+    explanation: Correct. It prints node, local AS, peer AS, peer address, state and
+      uptime.
+  - id: b
+    text: "`cilium bgp routes advertised`."
+    explanation: This lists routes, not sessions.
+  - id: c
+    text: "`kubectl get ciliumbgpadvertisements`."
+    explanation: This lists advertisements.
+  correct_option: a
+  explanation: Correct. It prints node, local AS, peer AS, peer address, state and
+    uptime.
+- id: ats059-020-04-q02
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Tell available from advertised routes
+  source_readings:
+  - sections/section-020/module-04/course-01-inspecting-sessions-and-routes.md
+  prompt: A route is listed by `cilium bgp routes available` and not by `cilium bgp
+    routes advertised`. Where do you look?
+  options:
+  - id: a
+    text: At the ASN of the router.
+    explanation: An ASN mismatch would break the session.
+  - id: b
+    text: 'At the selection chain: the labels that the peer configuration selects
+      and the labels of the advertisement.'
+    explanation: Correct. The node knows the route and does not send it.
+  - id: c
+    text: At the TCP port 179.
+    explanation: The session is up if routes are advertised at all.
+  correct_option: b
+  explanation: Correct. The node knows the route and does not send it.
+- id: ats059-020-04-q03
+  type: single_choice
+  difficulty: beginner
+  learning_objective: Name the router views
+  source_readings:
+  - sections/section-020/module-04/course-01-inspecting-sessions-and-routes.md
+  prompt: Which router command shows all attributes of one prefix, including communities?
+  options:
+  - id: a
+    text: "`show bgp summary`."
+    explanation: This shows neighbors.
+  - id: b
+    text: "`show ip route bgp`."
+    explanation: This shows installed routes without BGP attributes.
+  - id: c
+    text: "`show bgp ipv4 unicast <ADDRESS>/32`."
+    explanation: Correct. It lists each path with the next hop and attributes.
+  correct_option: c
+  explanation: Correct. It lists each path with the next hop and attributes.
+- id: ats059-020-04-q04
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Place the community
+  source_readings:
+  - sections/section-020/module-04/course-02-route-attributes-communities-and-preference.md
+  prompt: Where in the Cilium resources do you set a standard community?
+  options:
+  - id: a
+    text: In `attributes.communities.standard` of an entry of a `CiliumBGPAdvertisement`.
+    explanation: Correct. The attributes belong to the entry that creates the route.
+  - id: b
+    text: In the `CiliumBGPPeerConfig`.
+    explanation: The peer configuration holds timers and families.
+  - id: c
+    text: In the `CiliumBGPClusterConfig`.
+    explanation: The cluster configuration holds instances and peers.
+  correct_option: a
+  explanation: Correct. The attributes belong to the entry that creates the route.
+- id: ats059-020-04-q05
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Explain a community
+  source_readings:
+  - sections/section-020/module-04/course-02-route-attributes-communities-and-preference.md
+  prompt: What does a standard community do by itself?
+  options:
+  - id: a
+    text: It raises the priority of the route on every router.
+    explanation: Priority needs a policy or local preference.
+  - id: b
+    text: Nothing. It is a tag, and the router needs a policy that matches it.
+    explanation: Correct. Verify the effect on the router.
+  - id: c
+    text: It stops the route from leaving the cluster.
+    explanation: Only a well-known community such as `no-export` has a fixed meaning.
+  correct_option: b
+  explanation: Correct. Verify the effect on the router.
+- id: ats059-020-04-q06
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Use local preference
+  source_readings:
+  - sections/section-020/module-04/course-02-route-attributes-communities-and-preference.md
+  prompt: For which routers does local preference matter?
+  options:
+  - id: a
+    text: Only routers in other autonomous systems.
+    explanation: It is not sent to them.
+  - id: b
+    text: All routers on the Internet.
+    explanation: It stays inside one autonomous system.
+  - id: c
+    text: Routers in the same autonomous system, as in an iBGP design.
+    explanation: Correct. It is not used across an eBGP session in the common case.
+  correct_option: c
+  explanation: Correct. It is not used across an eBGP session in the common case.
+- id: ats059-020-04-q07
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Follow the order for a session that does not establish
+  source_readings:
+  - sections/section-020/module-04/course-03-troubleshooting-a-route-that-does-not-arrive.md
+  prompt: A session stays in `active`. Which check comes first in the fixed order?
+  options:
+  - id: a
+    text: That the feature is on and the node has the selecting label.
+    explanation: Correct. The order starts with the feature, the label and the names,
+      then the numbers and the reachability.
+  - id: b
+    text: The inbound policy of the router.
+    explanation: This is the last step.
+  - id: c
+    text: The communities of the advertisement.
+    explanation: Attributes matter only after the session is up.
+  correct_option: a
+  explanation: Correct. The order starts with the feature, the label and the names,
+    then the numbers and the reachability.
+- id: ats059-020-04-q08
+  type: single_choice
+  difficulty: advanced
+  learning_objective: Find a silent fault
+  source_readings:
+  - sections/section-020/module-04/course-03-troubleshooting-a-route-that-does-not-arrive.md
+  prompt: 'The peer configuration selects `advertise: bgp`. The advertisement has
+    the label `advertise: bgpp`. What does Kubernetes do?'
+  options:
+  - id: a
+    text: It refuses the advertisement.
+    explanation: Labels are free text.
+  - id: b
+    text: It accepts both and the advertisement stays unused, with no error.
+    explanation: Correct. A label typo is valid and silent.
+  - id: c
+    text: It sends the route with a default community.
+    explanation: No route is sent.
+  correct_option: b
+  explanation: Correct. A label typo is valid and silent.
+- id: ats059-020-04-q09
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Know what a restart hides
+  source_readings:
+  - sections/section-020/module-04/course-03-troubleshooting-a-route-that-does-not-arrive.md
+  prompt: Why is a restart of the agents a poor first step?
+  options:
+  - id: a
+    text: It deletes the resources.
+    explanation: Resources stay in the API server.
+  - id: b
+    text: It changes the ASN.
+    explanation: The ASN comes from the configuration.
+  - id: c
+    text: It hides the cause and drops the sessions, so routes disappear without graceful
+      restart.
+    explanation: Correct. Read the views first.
+  correct_option: c
+  explanation: Correct. Read the views first.
+- id: ats059-020-04-q10
+  type: single_choice
+  difficulty: advanced
+  learning_objective: Map the older resource
+  source_readings:
+  - sections/section-020/module-04/course-04-older-resources-and-pod-address-pools.md
+  prompt: In a `CiliumBGPPeeringPolicy`, `exportPodCIDR` is set. What is the equivalent
+    in the current model, and what does a pod pool cluster use?
+  options:
+  - id: a
+    text: An advertisement of type `PodCIDR`. A cluster with multi-pool address management
+      uses the type `CiliumPodIPPool`.
+    explanation: Correct. The pool type selects pools by labels.
+  - id: b
+    text: A `serviceSelector`. A pool cluster uses the type `Service`.
+    explanation: This is for Service addresses.
+  - id: c
+    text: A timer in the peer configuration. A pool cluster uses the cluster configuration.
+    explanation: Timers do not announce prefixes.
+  correct_option: a
+  explanation: Correct. The pool type selects pools by labels.

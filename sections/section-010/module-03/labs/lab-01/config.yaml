@@ -1,0 +1,63 @@
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-059-lab-010-03-01
+  docs:
+    prerequisites: docs/prerequisites.md
+    question: question.md
+    solution: solution.md
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.0@sha256:452d707d4862f52530247495d180205e029056831160e22870e37e3f6c1ac31f
+    nodes:
+      workers: 2
+    networking:
+      disableDefaultCNI: true
+      kubeProxyMode: none
+      podSubnet: 10.244.0.0/16
+bootstrap:
+  init:
+  - name: seed-environment
+    description: Install Cilium, start the external containers and create the workloads
+    type: file
+    source: bootstrap/setup.sh
+testing:
+  init:
+  - name: apply-solution
+    description: Apply the reference solution
+    type: file
+    source: solution/apply.sh
+validation:
+  scripts:
+  - name: policy-by-name
+    description: "A CiliumNetworkPolicy in starfleet selects app=shuttle and allows the partner name with toFQDNs on port 8080"
+    type: file
+    source: validation/validate-policy-by-name.sh
+    hint: "Use toFQDNs with matchName set to PARTNER_NAME from the lab-env ConfigMap and port 8080 TCP."
+  - name: dns-rule
+    description: "The same policy allows DNS to CoreDNS with a rules.dns section"
+    type: file
+    source: validation/validate-dns-rule.sh
+    hint: "Allow port 53 to the kube-dns pods in kube-system and add rules.dns with a matchPattern."
+  - name: name-works
+    description: "shuttle reaches the partner by name"
+    type: file
+    source: validation/validate-name-works.sh
+    hint: "Call http://PARTNER_NAME:8080/ip from shuttle."
+  - name: decoy-blocked
+    description: "shuttle cannot reach the decoy address"
+    type: file
+    source: validation/validate-decoy-blocked.sh
+    hint: "Do not allow world, 0.0.0.0/0 or a wildcard name."
+  - name: no-wildcard
+    description: "No rule allows the world entity, all addresses or every name"
+    type: file
+    source: validation/validate-no-wildcard.sh
+    hint: "Remove toEntities world and all, toCIDR 0.0.0.0/0 and a toFQDNs matchPattern of a single star."
+  - name: drifter-unaffected
+    description: "drifter in outpost still reaches the decoy"
+    type: file
+    source: validation/validate-drifter-unaffected.sh
+    hint: "Select only app=shuttle in starfleet."
+teardown:
+  keepCluster: false

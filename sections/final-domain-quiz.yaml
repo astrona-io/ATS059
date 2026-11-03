@@ -12,7 +12,7 @@ scope:
   title: BGP and External Networking
 placement:
   position: after
-  reading: section-020/module-02/course-04-summary.md
+  reading: section-020/module-04/course-05-summary.md
 questions:
 - id: ats059-final-q01
   type: single_choice
@@ -295,3 +295,171 @@ questions:
   correct_option: a
   explanation: Correct. The timers set how long the session waits before it declares
     a peer down. The minimum hold time is 3 seconds.
+- id: ats059-final-q13
+  type: single_choice
+  difficulty: beginner
+  learning_objective: Explain why a name-based rule needs a DNS rule
+  source_readings:
+  - sections/section-010/module-03/course-01-how-a-fqdn-rule-works.md
+  prompt: 'A policy allows `toFQDNs` with `matchName: partner.lab.test` and has no
+    DNS rule. The pod resolves the name and connects. What happens?'
+  options:
+  - id: a
+    text: The connection is dropped, because the agent never sees the DNS answer and
+      has no address for the name.
+    explanation: Correct. The DNS proxy learns the address from the answer. Without
+      a DNS rule the proxy is not in the path.
+  - id: b
+    text: The connection works, because the agent reads the name from the packet.
+    explanation: A packet carries addresses only, not names.
+  - id: c
+    text: The connection works for one minute and is then dropped.
+    explanation: There is no initial grace period. Without the DNS rule nothing is
+      learned.
+  correct_option: a
+  explanation: Correct. The DNS proxy learns the address from the answer. Without
+    a DNS rule the proxy is not in the path.
+- id: ats059-final-q14
+  type: single_choice
+  difficulty: advanced
+  learning_objective: Apply deny precedence
+  source_readings:
+  - sections/section-010/module-03/course-03-entities-services-and-endpoints.md
+  prompt: 'A policy allows `toEntities: [world]` and also has an `egressDeny` rule
+    for `10.0.0.0/8`. A pod connects to `10.1.2.3`. What happens?'
+  options:
+  - id: a
+    text: The connection works, because the more specific allow comes first.
+    explanation: There is no order by specificity between allow and deny.
+  - id: b
+    text: The connection is dropped, because a deny rule wins over every allow rule.
+    explanation: Correct. Deny rules take precedence, which makes a wide allow with
+      a few denies a workable pattern.
+  - id: c
+    text: The connection works, because `world` includes private ranges.
+    explanation: The deny rule applies whatever the allow rule includes.
+  correct_option: b
+  explanation: Correct. Deny rules take precedence, which makes a wide allow with
+    a few denies a workable pattern.
+- id: ats059-final-q15
+  type: single_choice
+  difficulty: beginner
+  learning_objective: Name the requirements of the egress gateway
+  source_readings:
+  - sections/section-010/module-04/course-01-requirements-and-feature-checks.md
+  prompt: Which set of Helm values does the egress gateway need?
+  options:
+  - id: a
+    text: "`egressGateway.enabled=true`, `bpf.masquerade=true` and `kubeProxyReplacement=true`."
+    explanation: Correct. These three are the requirements.
+  - id: b
+    text: Only `egressGateway.enabled=true`.
+    explanation: The feature also needs eBPF masquerading and kube-proxy replacement.
+  - id: c
+    text: "`egressGateway.enabled=true` and `bgpControlPlane.enabled=true`."
+    explanation: BGP is not a requirement.
+  correct_option: a
+  explanation: Correct. These three are the requirements.
+- id: ats059-final-q16
+  type: single_choice
+  difficulty: advanced
+  learning_objective: Know that the gateway policy does not allow traffic
+  source_readings:
+  - sections/section-010/module-04/course-03-policy-design.md
+  prompt: A namespace has default deny for egress. A gateway policy selects `shuttle`
+    and the partner. What else does the partner connection need?
+  options:
+  - id: a
+    text: Nothing, the gateway policy allows the traffic.
+    explanation: The gateway policy does not authorize.
+  - id: b
+    text: A network policy rule that allows the partner.
+    explanation: Correct. The gateway policy chooses the path and the address. It
+      never allows traffic.
+  - id: c
+    text: A second gateway policy.
+    explanation: Two policies would overlap and do not add authorization.
+  correct_option: b
+  explanation: Correct. The gateway policy chooses the path and the address. It never
+    allows traffic.
+- id: ats059-final-q17
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Write the policy
+  source_readings:
+  - sections/section-020/module-03/course-02-the-announcement-policy.md
+  prompt: 'A `CiliumL2AnnouncementPolicy` should announce load balancer addresses
+    of Services with the label `announce: l2`. Which fields do you set?'
+  options:
+  - id: a
+    text: "`serviceSelector` with that label and `loadBalancerIPs: true`."
+    explanation: Correct. The selector chooses the Services and the flag chooses the
+      address type.
+  - id: b
+    text: "`podSelector` and `externalIPs: true`."
+    explanation: The selector is for Services, and the flag is for external IPs.
+  - id: c
+    text: "`nodeSelector` only."
+    explanation: The node selector chooses nodes, not Services.
+  correct_option: a
+  explanation: Correct. The selector chooses the Services and the flag chooses the
+    address type.
+- id: ats059-final-q18
+  type: single_choice
+  difficulty: advanced
+  learning_objective: Explain failover
+  source_readings:
+  - sections/section-020/module-03/course-03-leases-failover-and-limits.md
+  prompt: The node that holds the lease stops. What happens next?
+  options:
+  - id: a
+    text: Nothing, because all nodes answer all the time.
+    explanation: Only the holder answers.
+  - id: b
+    text: The lease expires, another selected node takes it and announces the address
+      again.
+    explanation: Correct. The failover time depends on the lease timing.
+  - id: c
+    text: The Service gets a new address from the pool.
+    explanation: The address stays the same.
+  correct_option: b
+  explanation: Correct. The failover time depends on the lease timing.
+- id: ats059-final-q19
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Explain a community
+  source_readings:
+  - sections/section-020/module-04/course-02-route-attributes-communities-and-preference.md
+  prompt: What does a standard community do by itself?
+  options:
+  - id: a
+    text: It raises the priority of the route on every router.
+    explanation: Priority needs a policy or local preference.
+  - id: b
+    text: Nothing. It is a tag, and the router needs a policy that matches it.
+    explanation: Correct. Verify the effect on the router.
+  - id: c
+    text: It stops the route from leaving the cluster.
+    explanation: Only a well-known community such as `no-export` has a fixed meaning.
+  correct_option: b
+  explanation: Correct. Verify the effect on the router.
+- id: ats059-final-q20
+  type: single_choice
+  difficulty: advanced
+  learning_objective: Find a silent fault
+  source_readings:
+  - sections/section-020/module-04/course-03-troubleshooting-a-route-that-does-not-arrive.md
+  prompt: 'The peer configuration selects `advertise: bgp`. The advertisement has
+    the label `advertise: bgpp`. What does Kubernetes do?'
+  options:
+  - id: a
+    text: It refuses the advertisement.
+    explanation: Labels are free text.
+  - id: b
+    text: It accepts both and the advertisement stays unused, with no error.
+    explanation: Correct. A label typo is valid and silent.
+  - id: c
+    text: It sends the route with a default community.
+    explanation: No route is sent.
+  correct_option: b
+  explanation: Correct. A label typo is valid and silent.

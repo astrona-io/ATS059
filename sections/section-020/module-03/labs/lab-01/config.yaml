@@ -1,0 +1,63 @@
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-059-lab-020-03-01
+  docs:
+    prerequisites: docs/prerequisites.md
+    question: question.md
+    solution: solution.md
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.0@sha256:452d707d4862f52530247495d180205e029056831160e22870e37e3f6c1ac31f
+    nodes:
+      workers: 2
+    networking:
+      disableDefaultCNI: true
+      kubeProxyMode: none
+      podSubnet: 10.244.0.0/16
+bootstrap:
+  init:
+  - name: seed-environment
+    description: Install Cilium, start the external containers and create the workloads
+    type: file
+    source: bootstrap/setup.sh
+testing:
+  init:
+  - name: apply-solution
+    description: Apply the reference solution
+    type: file
+    source: solution/apply.sh
+validation:
+  scripts:
+  - name: service-has-address
+    description: "The Service probe-public in starfleet is of type LoadBalancer and has an address from the pool"
+    type: file
+    source: validation/validate-service-has-address.sh
+    hint: "Create a Service probe-public of type LoadBalancer for app=probe with the label announce=l2."
+  - name: policy-selects-service
+    description: "A CiliumL2AnnouncementPolicy selects the Service by label and announces load balancer addresses"
+    type: file
+    source: validation/validate-policy-selects-service.sh
+    hint: "Set serviceSelector to announce=l2 and loadBalancerIPs to true."
+  - name: policy-selects-workers
+    description: "The policy limits the answering nodes to nodes that are not control plane nodes"
+    type: file
+    source: validation/validate-policy-selects-workers.sh
+    hint: "Add a nodeSelector with the key node-role.kubernetes.io/control-plane and the operator DoesNotExist."
+  - name: lease-holder-is-worker
+    description: "The lease of probe-public is held by a worker node"
+    type: file
+    source: validation/validate-lease-holder-is-worker.sh
+    hint: "Read the lease cilium-l2announce-starfleet-probe-public in kube-system."
+  - name: reachable-from-network
+    description: "A client on the node network reaches the Service address"
+    type: file
+    source: validation/validate-reachable-from-network.sh
+    hint: "Call the address from a worker container with docker exec and curl."
+  - name: no-open-policy
+    description: "No announcement policy selects all Services"
+    type: file
+    source: validation/validate-no-open-policy.sh
+    hint: "Every policy needs a serviceSelector."
+teardown:
+  keepCluster: false

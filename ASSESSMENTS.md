@@ -5,7 +5,7 @@ version 1 and the contract in `schemas/question-bank.schema.json`. This is an
 authoring format for future application integration, not an existing Astrona
 quiz API. No YAML question file is registered as a Markdown reading.
 
-Each section has a knowledge check (`sections/section-010/quiz.yaml`, `sections/section-020/quiz.yaml`) after the last module summary of the section, and `sections/final-domain-quiz.yaml` covers the whole domain. Banks hold original single-choice questions with exactly three options, scoped to concepts taught in the course. They remain draft for review.
+Each new deepening module has a ten-question bank (`quiz.yaml` in its module folder) after its summary. Each section has a knowledge check (`sections/section-010/quiz.yaml`, `sections/section-020/quiz.yaml`) after the last module summary of the section, and `sections/final-domain-quiz.yaml` covers the whole domain. Banks hold original single-choice questions with exactly three options, scoped to concepts taught in the course. They remain draft for review.
 
 ## Fields And Rendering
 

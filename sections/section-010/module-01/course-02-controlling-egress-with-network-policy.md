@@ -11,7 +11,7 @@ By default every pod can open a connection to any address it can route to. For a
 
 A `CiliumNetworkPolicy` is a Cilium resource (API group `cilium.io/v2`) that selects pods with an `endpointSelector` and lists what those pods may send (`egress`) or receive (`ingress`). The Cilium agent on each node compiles the policy into eBPF maps. The eBPF program on the network interface of the pod checks every new connection against the maps.
 
-Two behaviors matter before you write the first rule. First, a pod that no policy selects accepts all traffic. Second, as soon as one policy with an `egress` section selects a pod, the pod may send only what the rules allow. All other egress is dropped. Rules only add permissions; there is no deny rule in this model.
+Two behaviors matter before you write the first rule. First, a pod that no policy selects accepts all traffic. Second, as soon as one policy with an `egress` section selects a pod, the pod may send only what the rules allow. All other egress is dropped. Allow rules only add permissions. Cilium also has explicit deny rules (`egressDeny`), which take precedence over every allow rule. The last part of this module covers them.
 
 ## Step 1: deny all egress for one pod
 

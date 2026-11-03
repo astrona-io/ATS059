@@ -1,0 +1,63 @@
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-059-lab-010-04-01
+  docs:
+    prerequisites: docs/prerequisites.md
+    question: question.md
+    solution: solution.md
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.0@sha256:452d707d4862f52530247495d180205e029056831160e22870e37e3f6c1ac31f
+    nodes:
+      workers: 2
+    networking:
+      disableDefaultCNI: true
+      kubeProxyMode: none
+      podSubnet: 10.244.0.0/16
+bootstrap:
+  init:
+  - name: seed-environment
+    description: Install Cilium, start the external containers and create the workloads
+    type: file
+    source: bootstrap/setup.sh
+testing:
+  init:
+  - name: apply-solution
+    description: Apply the reference solution
+    type: file
+    source: solution/apply.sh
+validation:
+  scripts:
+  - name: node-labelled
+    description: "Exactly one node has the label role=egress-gateway and it is the second worker"
+    type: file
+    source: validation/validate-node-labelled.sh
+    hint: "Label only the node named in GATEWAY2_NODE with role=egress-gateway."
+  - name: policy-uses-label
+    description: "The gateway policy selects the nodes by the label role=egress-gateway"
+    type: file
+    source: validation/validate-policy-uses-label.sh
+    hint: "Use nodeSelector matchLabels role=egress-gateway, not kubernetes.io/hostname."
+  - name: policy-uses-new-address
+    description: "The gateway policy uses GATEWAY2_IP as egressIP"
+    type: file
+    source: validation/validate-policy-uses-new-address.sh
+    hint: "Read GATEWAY2_IP from the lab-env ConfigMap."
+  - name: shuttle-new-origin
+    description: "The partner sees GATEWAY2_IP for requests from shuttle"
+    type: file
+    source: validation/validate-shuttle-new-origin.sh
+    hint: "Test with a new connection from shuttle to the partner /ip path."
+  - name: drifter-unselected
+    description: "drifter is not selected and the partner does not see GATEWAY2_IP for it"
+    type: file
+    source: validation/validate-drifter-unselected.sh
+    hint: "Keep the selector on app=shuttle in the starfleet namespace."
+  - name: no-wildcard
+    description: "The policy has no wildcard destination"
+    type: file
+    source: validation/validate-no-wildcard-destination.sh
+    hint: "Keep the partner address as a single /32 prefix."
+teardown:
+  keepCluster: false

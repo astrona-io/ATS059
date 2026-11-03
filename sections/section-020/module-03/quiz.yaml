@@ -1,0 +1,216 @@
+schema_version: 1
+kind: question_bank
+id: ats059-020-03
+course_id: ATS059
+exam_code: CCA
+status: draft
+provenance: Original practice material written for this course; not official exam
+  questions.
+scope:
+  type: module
+  id: module-03
+  title: Announce Service Addresses Without BGP
+placement:
+  position: after
+  reading: section-020/module-03/course-05-summary.md
+questions:
+- id: ats059-020-03-q01
+  type: single_choice
+  difficulty: beginner
+  learning_objective: Explain Layer 2 announcements
+  source_readings:
+  - sections/section-020/module-03/course-01-layer-2-announcements.md
+  prompt: What does a node do for a Service address when Layer 2 announcements are
+    on?
+  options:
+  - id: a
+    text: It answers ARP requests for the address with its own MAC address.
+    explanation: Correct. For IPv6 it answers NDP.
+  - id: b
+    text: It starts a BGP session for the address.
+    explanation: BGP is a different option.
+  - id: c
+    text: It adds the address to its interface and routes traffic from there.
+    explanation: The announcement is the answer, not an address on an interface.
+  correct_option: a
+  explanation: Correct. For IPv6 it answers NDP.
+- id: ats059-020-03-q02
+  type: single_choice
+  difficulty: beginner
+  learning_objective: Name the Helm values
+  source_readings:
+  - sections/section-020/module-03/course-01-layer-2-announcements.md
+  prompt: Which Helm value turns on Layer 2 announcements?
+  options:
+  - id: a
+    text: "`l2.enabled=true`."
+    explanation: This is not the name of the value.
+  - id: b
+    text: "`l2announcements.enabled=true`."
+    explanation: Correct. The feature also needs kube-proxy replacement.
+  - id: c
+    text: "`bgpControlPlane.enabled=true`."
+    explanation: This is the BGP value.
+  correct_option: b
+  explanation: Correct. The feature also needs kube-proxy replacement.
+- id: ats059-020-03-q03
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Know the rate limit consideration
+  source_readings:
+  - sections/section-020/module-03/course-01-layer-2-announcements.md
+  prompt: Why can a cluster with many announced Services need higher API client rate
+    limits?
+  options:
+  - id: a
+    text: Each Service needs a new pool.
+    explanation: Pools are not created per Service.
+  - id: b
+    text: Each Service needs its own BGP session.
+    explanation: No BGP is involved.
+  - id: c
+    text: Each announced Service has a lease that is renewed through the API server.
+    explanation: Correct. Many leases mean many API requests.
+  correct_option: c
+  explanation: Correct. Many leases mean many API requests.
+- id: ats059-020-03-q04
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Write the policy
+  source_readings:
+  - sections/section-020/module-03/course-02-the-announcement-policy.md
+  prompt: 'A `CiliumL2AnnouncementPolicy` should announce load balancer addresses
+    of Services with the label `announce: l2`. Which fields do you set?'
+  options:
+  - id: a
+    text: "`serviceSelector` with that label and `loadBalancerIPs: true`."
+    explanation: Correct. The selector chooses the Services and the flag chooses the
+      address type.
+  - id: b
+    text: "`podSelector` and `externalIPs: true`."
+    explanation: The selector is for Services, and the flag is for external IPs.
+  - id: c
+    text: "`nodeSelector` only."
+    explanation: The node selector chooses nodes, not Services.
+  correct_option: a
+  explanation: Correct. The selector chooses the Services and the flag chooses the
+    address type.
+- id: ats059-020-03-q05
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Limit the answering nodes
+  source_readings:
+  - sections/section-020/module-03/course-02-the-announcement-policy.md
+  prompt: Which field keeps the control plane nodes from answering?
+  options:
+  - id: a
+    text: An `interfaces` list with the worker interface name.
+    explanation: Interfaces choose the network device, not the node.
+  - id: b
+    text: A `nodeSelector` with the key `node-role.kubernetes.io/control-plane` and
+      the operator `DoesNotExist`.
+    explanation: Correct. Only nodes that match can hold the lease.
+  - id: c
+    text: A taint on the control plane node.
+    explanation: A taint does not affect the announcement.
+  correct_option: b
+  explanation: Correct. Only nodes that match can hold the lease.
+- id: ats059-020-03-q06
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Use the interface list
+  source_readings:
+  - sections/section-020/module-03/course-02-the-announcement-policy.md
+  prompt: What does the `interfaces` field of the policy contain?
+  options:
+  - id: a
+    text: IP addresses of the interfaces.
+    explanation: The field takes names as regular expressions.
+  - id: b
+    text: MAC addresses.
+    explanation: The field takes names, not MAC addresses.
+  - id: c
+    text: Regular expressions that match the interface names on which the node answers.
+    explanation: Correct. The default is all interfaces.
+  correct_option: c
+  explanation: Correct. The default is all interfaces.
+- id: ats059-020-03-q07
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Find the lease
+  source_readings:
+  - sections/section-020/module-03/course-03-leases-failover-and-limits.md
+  prompt: Where does the lease of the Service `probe-public` in `starfleet` live?
+  options:
+  - id: a
+    text: In `kube-system`, named `cilium-l2announce-starfleet-probe-public`.
+    explanation: Correct. The name has the namespace and the Service name.
+  - id: b
+    text: In `starfleet`, named `probe-public`.
+    explanation: Leases for announcements are in `kube-system`.
+  - id: c
+    text: In `default`, named `l2-probe-public`.
+    explanation: This is not the naming.
+  correct_option: a
+  explanation: Correct. The name has the namespace and the Service name.
+- id: ats059-020-03-q08
+  type: single_choice
+  difficulty: advanced
+  learning_objective: Explain failover
+  source_readings:
+  - sections/section-020/module-03/course-03-leases-failover-and-limits.md
+  prompt: The node that holds the lease stops. What happens next?
+  options:
+  - id: a
+    text: Nothing, because all nodes answer all the time.
+    explanation: Only the holder answers.
+  - id: b
+    text: The lease expires, another selected node takes it and announces the address
+      again.
+    explanation: Correct. The failover time depends on the lease timing.
+  - id: c
+    text: The Service gets a new address from the pool.
+    explanation: The address stays the same.
+  correct_option: b
+  explanation: Correct. The failover time depends on the lease timing.
+- id: ats059-020-03-q09
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: State the limits
+  source_readings:
+  - sections/section-020/module-03/course-03-leases-failover-and-limits.md
+  prompt: Which statement about Layer 2 announcements is correct?
+  options:
+  - id: a
+    text: Traffic is spread over all nodes with equal-cost paths.
+    explanation: This is how BGP can work.
+  - id: b
+    text: Clients in other networks reach the address through any router.
+    explanation: The announcement is link-local.
+  - id: c
+    text: One node carries all traffic for one address, and clients must be on the
+      same Layer 2 segment.
+    explanation: Correct. These are the two main limits.
+  correct_option: c
+  explanation: Correct. These are the two main limits.
+- id: ats059-020-03-q10
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Choose between options
+  source_readings:
+  - sections/section-020/module-03/course-04-node-ipam-and-choosing-an-option.md
+  prompt: A flat office network has no BGP routers. One node can carry the load of
+    a Service. Which option fits, and how do you select Node IPAM?
+  options:
+  - id: a
+    text: 'Layer 2 announcements fit. Node IPAM is selected with `loadBalancerClass:
+      io.cilium/node` and gives the node addresses.'
+    explanation: Correct. Node IPAM does not announce anything.
+  - id: b
+    text: BGP fits, and Node IPAM is selected with an annotation.
+    explanation: BGP needs routers. Node IPAM uses the load balancer class.
+  - id: c
+    text: Node IPAM fits, because it moves addresses between nodes.
+    explanation: Node IPAM does not announce or move addresses.
+  correct_option: a
+  explanation: Correct. Node IPAM does not announce anything.

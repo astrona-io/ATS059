@@ -1,0 +1,238 @@
+schema_version: 1
+kind: question_bank
+id: ats059-010-03
+course_id: ATS059
+exam_code: CCA
+status: draft
+provenance: Original practice material written for this course; not official exam
+  questions.
+scope:
+  type: module
+  id: module-03
+  title: Allow External Services By Name And Entity
+placement:
+  position: after
+  reading: section-010/module-03/course-05-summary.md
+questions:
+- id: ats059-010-03-q01
+  type: single_choice
+  difficulty: beginner
+  learning_objective: Explain why a name-based rule needs a DNS rule
+  source_readings:
+  - sections/section-010/module-03/course-01-how-a-fqdn-rule-works.md
+  prompt: 'A policy allows `toFQDNs` with `matchName: partner.lab.test` and has no
+    DNS rule. The pod resolves the name and connects. What happens?'
+  options:
+  - id: a
+    text: The connection is dropped, because the agent never sees the DNS answer and
+      has no address for the name.
+    explanation: Correct. The DNS proxy learns the address from the answer. Without
+      a DNS rule the proxy is not in the path.
+  - id: b
+    text: The connection works, because the agent reads the name from the packet.
+    explanation: A packet carries addresses only, not names.
+  - id: c
+    text: The connection works for one minute and is then dropped.
+    explanation: There is no initial grace period. Without the DNS rule nothing is
+      learned.
+  correct_option: a
+  explanation: Correct. The DNS proxy learns the address from the answer. Without
+    a DNS rule the proxy is not in the path.
+- id: ats059-010-03-q02
+  type: single_choice
+  difficulty: beginner
+  learning_objective: Name the component that links names to addresses
+  source_readings:
+  - sections/section-010/module-03/course-01-how-a-fqdn-rule-works.md
+  prompt: Which component stores the address of an allowed name together with its
+    TTL?
+  options:
+  - id: a
+    text: The CoreDNS deployment of the cluster.
+    explanation: CoreDNS answers the query and keeps no policy state for Cilium.
+  - id: b
+    text: The Cilium agent on the node, through its DNS proxy.
+    explanation: Correct. The agent keeps the cache and updates the allowed destinations.
+  - id: c
+    text: The Cilium operator.
+    explanation: The operator does not handle DNS answers on the node.
+  correct_option: b
+  explanation: Correct. The agent keeps the cache and updates the allowed destinations.
+- id: ats059-010-03-q03
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Use exact and wildcard name matching
+  source_readings:
+  - sections/section-010/module-03/course-02-matching-names-and-ttl.md
+  prompt: 'A rule uses `matchPattern: "*.partner.example"`. Which name does it NOT
+    match?'
+  options:
+  - id: a
+    text: "`api.partner.example`."
+    explanation: This name has a label in front of the domain and is matched.
+  - id: b
+    text: "`www.partner.example`."
+    explanation: This name has a label in front of the domain and is matched.
+  - id: c
+    text: "`partner.example`."
+    explanation: Correct. A wildcard needs a label in front, so the apex name needs
+      its own `matchName` entry.
+  correct_option: c
+  explanation: Correct. A wildcard needs a label in front, so the apex name needs
+    its own `matchName` entry.
+- id: ats059-010-03-q04
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Describe how the TTL controls the cache
+  source_readings:
+  - sections/section-010/module-03/course-02-matching-names-and-ttl.md
+  prompt: An allowed address expires from the FQDN cache while a connection to it
+    is open. What happens to that connection?
+  options:
+  - id: a
+    text: It continues. New connections to the address need a new lookup.
+    explanation: Correct. Established connections are tracked and continue, but new
+      ones need a fresh answer.
+  - id: b
+    text: It is closed at once.
+    explanation: Expiry affects new connections, not tracked ones.
+  - id: c
+    text: It continues, and new connections also work without a lookup.
+    explanation: The address is no longer allowed after expiry, so a lookup is needed.
+  correct_option: a
+  explanation: Correct. Established connections are tracked and continue, but new
+    ones need a fresh answer.
+- id: ats059-010-03-q05
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Know that decisions are made on addresses
+  source_readings:
+  - sections/section-010/module-03/course-01-how-a-fqdn-rule-works.md
+  prompt: Two names resolve to the same address. A rule allows only the first name.
+    The pod resolves both names. Can it reach the address through the second name?
+  options:
+  - id: a
+    text: No, because the rule names only the first name.
+    explanation: The datapath sees addresses, not names.
+  - id: b
+    text: Yes, because the allowed destination is the address that the first name
+      produced.
+    explanation: Correct. The decision uses the address, so the second name reaches
+      an allowed address.
+  - id: c
+    text: No, because the DNS proxy blocks the second lookup.
+    explanation: The proxy blocks only names that the DNS rule does not allow.
+  correct_option: b
+  explanation: Correct. The decision uses the address, so the second name reaches
+    an allowed address.
+- id: ats059-010-03-q06
+  type: single_choice
+  difficulty: beginner
+  learning_objective: Choose the entity for destinations outside the cluster
+  source_readings:
+  - sections/section-010/module-03/course-03-entities-services-and-endpoints.md
+  prompt: Which entity selects every destination outside the cluster?
+  options:
+  - id: a
+    text: "`cluster`."
+    explanation: "`cluster` means everything inside the cluster."
+  - id: b
+    text: "`remote-node`."
+    explanation: "`remote-node` means other nodes of the cluster."
+  - id: c
+    text: "`world`."
+    explanation: Correct. `world` means everything that is not in the cluster or on
+      a node.
+  correct_option: c
+  explanation: Correct. `world` means everything that is not in the cluster or on
+    a node.
+- id: ats059-010-03-q07
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Choose the rule type for a Service without selector
+  source_readings:
+  - sections/section-010/module-03/course-03-entities-services-and-endpoints.md
+  prompt: A Service without a selector points to an address outside the cluster. Which
+    egress rule type names it in a policy?
+  options:
+  - id: a
+    text: "`toServices`."
+    explanation: Correct. `toServices` selects a Service by name and namespace, including
+      one backed by external endpoints.
+  - id: b
+    text: "`toEndpoints`."
+    explanation: "`toEndpoints` selects pods by labels."
+  - id: c
+    text: "`toEntities` with `cluster`."
+    explanation: "`cluster` selects things inside the cluster."
+  correct_option: a
+  explanation: Correct. `toServices` selects a Service by name and namespace, including
+    one backed by external endpoints.
+- id: ats059-010-03-q08
+  type: single_choice
+  difficulty: advanced
+  learning_objective: Apply deny precedence
+  source_readings:
+  - sections/section-010/module-03/course-03-entities-services-and-endpoints.md
+  prompt: 'A policy allows `toEntities: [world]` and also has an `egressDeny` rule
+    for `10.0.0.0/8`. A pod connects to `10.1.2.3`. What happens?'
+  options:
+  - id: a
+    text: The connection works, because the more specific allow comes first.
+    explanation: There is no order by specificity between allow and deny.
+  - id: b
+    text: The connection is dropped, because a deny rule wins over every allow rule.
+    explanation: Correct. Deny rules take precedence, which makes a wide allow with
+      a few denies a workable pattern.
+  - id: c
+    text: The connection works, because `world` includes private ranges.
+    explanation: The deny rule applies whatever the allow rule includes.
+  correct_option: b
+  explanation: Correct. Deny rules take precedence, which makes a wide allow with
+    a few denies a workable pattern.
+- id: ats059-010-03-q09
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Diagnose a name-based rule that does not match
+  source_readings:
+  - sections/section-010/module-03/course-04-inspecting-and-diagnosing-name-based-policy.md
+  prompt: A pod cannot reach the partner by name. Where does the first check belong?
+  options:
+  - id: a
+    text: The Hubble flows of the operator.
+    explanation: Hubble is later in the order. The operator is not where the decision
+      is made.
+  - id: b
+    text: The Helm values of the chart.
+    explanation: Name-based rules do not depend on a Helm value that this course lists
+      as a first check.
+  - id: c
+    text: The lookup from the pod, to see which address the name resolves to.
+    explanation: Correct. The order is the lookup, the FQDN cache of the agent, the
+      flows and the enforcement state.
+  correct_option: c
+  explanation: Correct. The order is the lookup, the FQDN cache of the agent, the
+    flows and the enforcement state.
+- id: ats059-010-03-q10
+  type: single_choice
+  difficulty: advanced
+  learning_objective: Read the agent cache
+  source_readings:
+  - sections/section-010/module-03/course-04-inspecting-and-diagnosing-name-based-policy.md
+  prompt: The lookup works, but the connection is dropped. The FQDN cache of the agent
+    on the node of the pod has no entry for the name. What does it mean?
+  options:
+  - id: a
+    text: The proxy did not see the answer for that pod, so check the DNS rule and
+      the path of the lookup.
+    explanation: Correct. An empty cache points at the DNS rule or at lookups that
+      bypass the proxy.
+  - id: b
+    text: The partner is down.
+    explanation: A down partner would not stop the proxy from caching the answer.
+  - id: c
+    text: The TTL is too long.
+    explanation: A long TTL would keep an entry, not remove it.
+  correct_option: a
+  explanation: Correct. An empty cache points at the DNS rule or at lookups that bypass
+    the proxy.

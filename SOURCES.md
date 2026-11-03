@@ -17,6 +17,9 @@
 - [BGP](https://docs.cilium.io/en/stable/network/bgp-control-plane/bgp-control-plane/)
 - [Egress gateway](https://docs.cilium.io/en/stable/network/egress-gateway/egress-gateway/)
 - [LB IPAM](https://docs.cilium.io/en/stable/network/lb-ipam/)
+- [L2 announcements](https://docs.cilium.io/en/stable/network/l2-announcements/)
+- [Node IPAM LB](https://docs.cilium.io/en/stable/network/node-ipam/)
+- [DNS-based egress policy](https://docs.cilium.io/en/stable/security/policy/language/#dns-based)
 - [Kernel verifier](https://docs.kernel.org/bpf/verifier.html)
 
 Version-specific fields and options need confirmation against the intended deployed release before adding executable material. Configuration excerpts illustrate intent and do not claim installation or runtime results. Question banks are independently authored practice, not official examination items.

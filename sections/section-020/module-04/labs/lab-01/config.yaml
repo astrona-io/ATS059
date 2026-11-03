@@ -1,0 +1,63 @@
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-059-lab-020-04-01
+  docs:
+    prerequisites: docs/prerequisites.md
+    question: question.md
+    solution: solution.md
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.0@sha256:452d707d4862f52530247495d180205e029056831160e22870e37e3f6c1ac31f
+    nodes:
+      workers: 2
+    networking:
+      disableDefaultCNI: true
+      kubeProxyMode: none
+      podSubnet: 10.244.0.0/16
+bootstrap:
+  init:
+  - name: seed-environment
+    description: Install Cilium, start the external containers and create the workloads
+    type: file
+    source: bootstrap/setup.sh
+testing:
+  init:
+  - name: apply-solution
+    description: Apply the reference solution
+    type: file
+    source: solution/apply.sh
+validation:
+  scripts:
+  - name: sessions-established
+    description: "Both worker nodes keep an established session with the router"
+    type: file
+    source: validation/validate-sessions-established.sh
+    hint: "Do not change the peer or cluster configuration. The fault is in the advertisement and the Service."
+  - name: advertisement-selected
+    description: "The peer configuration selects an advertisement that exists"
+    type: file
+    source: validation/validate-advertisement-selected.sh
+    hint: "Compare the label that the peer configuration selects with the label of the advertisement."
+  - name: service-labeled
+    description: "The Service probe-public carries the label that the advertisement selects"
+    type: file
+    source: validation/validate-service-labeled.sh
+    hint: "Compare the selector of the advertisement with the labels of the Service."
+  - name: community-set
+    description: "The advertisement for Services sets the community 64513:100"
+    type: file
+    source: validation/validate-community-set.sh
+    hint: "Add attributes.communities.standard to the Service entry."
+  - name: router-has-route
+    description: "The router has a path to the Service address"
+    type: file
+    source: validation/validate-router-has-route.sh
+    hint: "Use show bgp ipv4 unicast with the address on the router container."
+  - name: router-sees-community
+    description: "The router shows the community 64513:100 on the Service address"
+    type: file
+    source: validation/validate-router-sees-community.sh
+    hint: "Read the path attributes with show bgp ipv4 unicast ADDRESS/32."
+teardown:
+  keepCluster: false
