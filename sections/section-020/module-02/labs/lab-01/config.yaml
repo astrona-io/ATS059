@@ -1,0 +1,58 @@
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-059-lab-020-02-01
+  docs:
+    prerequisites: docs/prerequisites.md
+    question: question.md
+    solution: solution.md
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.0@sha256:452d707d4862f52530247495d180205e029056831160e22870e37e3f6c1ac31f
+    nodes:
+      workers: 2
+    networking:
+      disableDefaultCNI: true
+      kubeProxyMode: none
+      podSubnet: 10.244.0.0/16
+bootstrap:
+  init:
+  - name: seed-environment
+    description: Install Cilium, start the external containers and create the workloads
+    type: file
+    source: bootstrap/setup.sh
+testing:
+  init:
+  - name: apply-solution
+    description: Apply the reference solution
+    type: file
+    source: solution/apply.sh
+validation:
+  scripts:
+  - name: service-has-address
+    description: "The Service probe-public in starfleet is of type LoadBalancer and has an address from the pool"
+    type: file
+    source: validation/validate-service-has-address.sh
+    hint: "Create a Service probe-public of type LoadBalancer for app=probe. The pool starfleet-pool assigns the address."
+  - name: service-advertisement
+    description: "A CiliumBGPAdvertisement of type Service announces the LoadBalancerIP and carries the label advertise=bgp"
+    type: file
+    source: validation/validate-service-advertisement.sh
+    hint: "Give the advertisement the label advertise=bgp, advertisementType Service and service.addresses LoadBalancerIP. Select the Service by label."
+  - name: router-service-route
+    description: "The router has a BGP route for the Service address"
+    type: file
+    source: validation/validate-router-service-route.sh
+    hint: "Label the Service so the advertisement selector matches it. Check the router with show ip route bgp."
+  - name: router-pod-prefixes
+    description: "The router has BGP routes for the pod prefixes of both workers"
+    type: file
+    source: validation/validate-router-pod-prefixes.sh
+    hint: "Add an advertisement of type PodCIDR with the label advertise=bgp."
+  - name: no-clusterip-advertised
+    description: "No advertisement announces ClusterIP addresses"
+    type: file
+    source: validation/validate-no-clusterip-advertised.sh
+    hint: "List only LoadBalancerIP in service.addresses."
+teardown:
+  keepCluster: false

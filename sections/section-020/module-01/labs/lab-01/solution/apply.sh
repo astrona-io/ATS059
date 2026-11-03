@@ -1,12 +1,43 @@
 #!/usr/bin/env bash
+# Reference solution: label the workers, then create the peer and cluster configuration.
 set -euo pipefail
-if [[ "$(kubectl config current-context)" != "kind-astro-ats-059-lab-020-01-01" ]]; then
-  printf 'Refusing to operate on another Kubernetes context\n' >&2
-  exit 1
-fi
-lab_directory="$(cd "$(dirname "$0")/.." && pwd)"
-solution_directory="$lab_directory/solution"
-node_name="astro-ats-059-lab-020-01-01-control-plane"
-worker_name="astro-ats-059-lab-020-01-01-worker"
-
-python3 "$solution_directory/record.py"
+router_ip="$(kubectl -n starfleet get configmap lab-env -o jsonpath='{.data.ROUTER_IP}')"
+router_asn="$(kubectl -n starfleet get configmap lab-env -o jsonpath='{.data.BGP_ROUTER_ASN}')"
+local_asn="$(kubectl -n starfleet get configmap lab-env -o jsonpath='{.data.BGP_LOCAL_ASN}')"
+for worker in $(kubectl get nodes -l '!node-role.kubernetes.io/control-plane' -o jsonpath='{.items[*].metadata.name}'); do
+  kubectl label node "$worker" bgp=enabled --overwrite
+done
+kubectl apply -f - <<YAML
+apiVersion: cilium.io/v2
+kind: CiliumBGPPeerConfig
+metadata:
+  name: cilium-peer
+spec:
+  timers:
+    holdTimeSeconds: 9
+    keepAliveTimeSeconds: 3
+  families:
+  - afi: ipv4
+    safi: unicast
+    advertisements:
+      matchLabels:
+        advertise: bgp
+---
+apiVersion: cilium.io/v2
+kind: CiliumBGPClusterConfig
+metadata:
+  name: cilium-bgp
+spec:
+  nodeSelector:
+    matchLabels:
+      bgp: enabled
+  bgpInstances:
+  - name: instance-nodes
+    localASN: ${local_asn}
+    peers:
+    - name: peer-router
+      peerASN: ${router_asn}
+      peerAddress: ${router_ip}
+      peerConfigRef:
+        name: cilium-peer
+YAML

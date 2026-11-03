@@ -2,12 +2,28 @@ schema_version: 1
 course_id: ATS059
 status: draft
 banks:
-- id: ats059-domain-review
-  path: assessments/domain-review.yaml
-  question_count: 6
+- id: ats059-010
+  path: sections/section-010/quiz.yaml
+  question_count: 9
   placement:
     position: after
-    reading: sections/section-020/module-01/course-02-summary.md
+    reading: sections/section-010/module-02/course-04-summary.md
+  covered_sections:
+  - section-010
+- id: ats059-020
+  path: sections/section-020/quiz.yaml
+  question_count: 9
+  placement:
+    position: after
+    reading: sections/section-020/module-02/course-04-summary.md
+  covered_sections:
+  - section-020
+- id: ats059-final
+  path: sections/final-domain-quiz.yaml
+  question_count: 12
+  placement:
+    position: after
+    reading: sections/section-020/module-02/course-04-summary.md
   covered_sections:
   - section-010
   - section-020

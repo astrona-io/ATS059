@@ -16,6 +16,7 @@
 - [Global Services](https://docs.cilium.io/en/stable/network/clustermesh/global-services/)
 - [BGP](https://docs.cilium.io/en/stable/network/bgp-control-plane/bgp-control-plane/)
 - [Egress gateway](https://docs.cilium.io/en/stable/network/egress-gateway/egress-gateway/)
+- [LB IPAM](https://docs.cilium.io/en/stable/network/lb-ipam/)
 - [Kernel verifier](https://docs.kernel.org/bpf/verifier.html)
 
 Version-specific fields and options need confirmation against the intended deployed release before adding executable material. Configuration excerpts illustrate intent and do not claim installation or runtime results. Question banks are independently authored practice, not official examination items.

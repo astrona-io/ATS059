@@ -1,0 +1,58 @@
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-059-lab-010-02-01
+  docs:
+    prerequisites: docs/prerequisites.md
+    question: question.md
+    solution: solution.md
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.0@sha256:452d707d4862f52530247495d180205e029056831160e22870e37e3f6c1ac31f
+    nodes:
+      workers: 2
+    networking:
+      disableDefaultCNI: true
+      kubeProxyMode: none
+      podSubnet: 10.244.0.0/16
+bootstrap:
+  init:
+  - name: seed-environment
+    description: Install Cilium, start the external containers and create the workloads
+    type: file
+    source: bootstrap/setup.sh
+testing:
+  init:
+  - name: apply-solution
+    description: Apply the reference solution
+    type: file
+    source: solution/apply.sh
+validation:
+  scripts:
+  - name: policy-exists
+    description: "A CiliumEgressGatewayPolicy selects app=shuttle in starfleet and targets the partner as a /32"
+    type: file
+    source: validation/validate-policy-exists.sh
+    hint: "Create a CiliumEgressGatewayPolicy with a podSelector for app=shuttle and io.kubernetes.pod.namespace=starfleet, and destinationCIDRs with the partner address as /32."
+  - name: egress-ip-set
+    description: "The policy uses the gateway address from the lab-env ConfigMap as egressIP and the gateway node as nodeSelector"
+    type: file
+    source: validation/validate-egress-ip-set.sh
+    hint: "Read GATEWAY_IP and GATEWAY_NODE from the lab-env ConfigMap. Use kubernetes.io/hostname for the node selector."
+  - name: shuttle-source-ip
+    description: "The partner sees the gateway address for requests from shuttle"
+    type: file
+    source: validation/validate-shuttle-source-ip.sh
+    hint: "Call the partner /ip path from shuttle with a new connection and compare origin with GATEWAY_IP."
+  - name: drifter-source-ip
+    description: "drifter is not selected and the partner does not see the gateway address for it"
+    type: file
+    source: validation/validate-drifter-source-ip.sh
+    hint: "Select only app=shuttle in the starfleet namespace. Do not select outpost."
+  - name: no-wildcard-destination
+    description: "The policy does not use a wildcard destination"
+    type: file
+    source: validation/validate-no-wildcard-destination.sh
+    hint: "Do not put 0.0.0.0/0 in destinationCIDRs."
+teardown:
+  keepCluster: false

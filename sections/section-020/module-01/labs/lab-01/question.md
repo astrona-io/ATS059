@@ -1,35 +1,33 @@
 ---
 draft: true
 exam_objectives:
-- Understand Options to Connect Cilium-managed Clusters with External Networks
+- BGP Control Plane
 ---
-# Inspect BGP Control Plane Readiness
+# Peer The Worker Nodes With The External Router
 
-Record source addressing and the enabled control-plane baseline.
+The network team runs a router outside the cluster. The two worker nodes of the cluster must open BGP sessions with it. Configure the peering with the Cilium BGP Control Plane resources and make both sessions reach the state `established`. The control plane node must not run BGP.
 
 ## Starting state
 
-Cilium manages the private two-node cluster. Hubble Relay and the BGP control plane are enabled. The probe and two clients are healthy; no learner policy or evidence report exists. This baseline uses kube-proxy and tunnelling.
+A three-node `kind` cluster runs Cilium with the BGP Control Plane enabled. An FRR router runs in a Docker container on the same Docker network. It accepts sessions from the node network when the peer uses the ASN of the nodes. No BGP resource exists yet.
 
-Use a host shell with the private kubeconfig for this independent kind environment. A kubeconfig identifies the cluster and credentials used by kubectl, the Kubernetes command-line tool.
+The ConfigMap `lab-env` in `starfleet` holds the facts:
 
 ```sh
-export KUBECONFIG="$(astrona kubeconfig ats-059-lab-020-01-01)"
-test "$(kubectl config current-context)" = "kind-astro-ats-059-lab-020-01-01" || exit 1
-node_name="astro-ats-059-lab-020-01-01-control-plane"
-worker_name="astro-ats-059-lab-020-01-01-worker"
+kubectl -n starfleet get configmap lab-env -o jsonpath='{.data.ROUTER_IP}'
+kubectl -n starfleet get configmap lab-env -o jsonpath='{.data.BGP_ROUTER_ASN}'
+kubectl -n starfleet get configmap lab-env -o jsonpath='{.data.BGP_LOCAL_ASN}'
 ```
-
-Keep this connection selected. Host-level commands name only this environment's node containers. They do not operate on the host operating system.
 
 ## Required result
 
-Confirm that the BGP control plane is enabled and inventory node PodCIDRs. This is prerequisite evidence. No external BGP peer is configured, so established sessions and route advertisements are not graded.
+- Both worker nodes carry a label, and the control plane node does not.
+- A `CiliumBGPClusterConfig` selects the labeled nodes. Its instance uses `BGP_LOCAL_ASN` as `localASN`, and one peer uses `BGP_ROUTER_ASN` as `peerASN` and `ROUTER_IP` as `peerAddress`.
+- The peer references an existing `CiliumBGPPeerConfig` with an `ipv4` `unicast` family.
+- The `CiliumBGPNodeConfig` of each worker shows the peering state `established`.
 
-Record observations in `starfleet/evidence`, whose `report.json` contains the stated report. The verifier reads the live API again; invented values do not pass.
+Submit when you are done:
 
-The report object uses these fields: `source_ip`, `node`, `node_pod_cidr`, `bgp_enabled`. Keep numeric values numeric and preserve arrays and nested objects returned by the API.
-
-## Verify The Result
-
-The grader checks the required object fields and actual observations. Wait for controller convergence before submitting. Preserve the task's namespace, workload names and unrelated components.
+```sh
+astrona submit -c .
+```

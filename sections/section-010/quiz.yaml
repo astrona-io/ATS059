@@ -1,0 +1,231 @@
+schema_version: 1
+kind: question_bank
+id: ats059-010
+course_id: ATS059
+exam_code: CCA
+status: draft
+provenance: Original practice material written for this course; not official exam
+  questions.
+scope:
+  type: section
+  id: section-010
+  title: Egress Connectivity Requirements
+placement:
+  position: after
+  reading: section-010/module-02/course-04-summary.md
+questions:
+- id: ats059-010-q01
+  type: single_choice
+  difficulty: beginner
+  learning_objective: Predict the source address that an external service sees for
+    traffic from a pod
+  source_readings:
+  - sections/section-010/module-01/course-01-the-egress-path-and-masquerading.md
+  prompt: The `shuttle` pod calls the partner service outside the cluster with eBPF
+    masquerading on. Which source address does the partner record?
+  options:
+  - id: a
+    text: The address of the `shuttle` pod.
+    explanation: The pod address is only valid inside the cluster and is replaced
+      before the packet leaves the node.
+  - id: b
+    text: The address of the node that runs the pod.
+    explanation: Correct. The Cilium agent rewrites the source address to the node
+      address and keeps a connection entry to translate the reply back.
+  - id: c
+    text: The ClusterIP of the `probe` Service.
+    explanation: A Service address is a destination inside the cluster and is never
+      a source toward the partner.
+  correct_option: b
+  explanation: Correct. The Cilium agent rewrites the source address to the node address
+    and keeps a connection entry to translate the reply back.
+- id: ats059-010-q02
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Name the destinations that keep the pod source address
+  source_readings:
+  - sections/section-010/module-01/course-01-the-egress-path-and-masquerading.md
+  prompt: Which destination keeps the pod address as source when `ipv4NativeRoutingCIDR`
+    is `10.244.0.0/16`?
+  options:
+  - id: a
+    text: Any address that starts with `10.`.
+    explanation: Only the configured range is exempt, not every private address.
+  - id: b
+    text: Every address on the Docker network.
+    explanation: The partner is outside the range, so traffic to it is masqueraded.
+  - id: c
+    text: Another pod with an address inside `10.244.0.0/16`.
+    explanation: Correct. Destinations inside the native routing range are reachable
+      without translation, so the pod address stays.
+  correct_option: c
+  explanation: Correct. Destinations inside the native routing range are reachable
+    without translation, so the pod address stays.
+- id: ats059-010-q03
+  type: single_choice
+  difficulty: beginner
+  learning_objective: Write a default deny egress policy that still allows name resolution
+  source_readings:
+  - sections/section-010/module-01/course-02-controlling-egress-with-network-policy.md
+  prompt: 'After you apply a `CiliumNetworkPolicy` with `egress: [- {}]` to `shuttle`,
+    `curl http://probe/` fails with a name resolution error. What is missing?'
+  options:
+  - id: a
+    text: An egress rule to the CoreDNS pods on port 53, with a `rules.dns` section.
+    explanation: Correct. Default deny blocks DNS too. The DNS rule sends queries
+      through the Cilium DNS proxy and allows them.
+  - id: b
+    text: A `toCIDR` rule for `0.0.0.0/0`.
+    explanation: A wildcard CIDR would remove the restriction the policy exists to
+      create, and does not match cluster pods.
+  - id: c
+    text: An ingress rule on the `probe` pods.
+    explanation: The failure is at name resolution, before any connection to the `probe`
+      pods.
+  correct_option: a
+  explanation: Correct. Default deny blocks DNS too. The DNS rule sends queries through
+    the Cilium DNS proxy and allows them.
+- id: ats059-010-q04
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Explain why a toFQDNs rule needs a DNS rule
+  source_readings:
+  - sections/section-010/module-01/course-02-controlling-egress-with-network-policy.md
+  prompt: A policy has a `toFQDNs` rule for `api.partner.example` and no DNS rule.
+    The pod resolves the name through CoreDNS. What happens to the connection?
+  options:
+  - id: a
+    text: It is allowed, because the name is on the allowlist.
+    explanation: The rule allows addresses, and the addresses come from the proxy
+      cache, not from the name text.
+  - id: b
+    text: It is blocked, because the agent learns allowed addresses only from DNS
+      answers that its DNS proxy sees.
+    explanation: Correct. Without a DNS rule the queries do not pass the DNS proxy,
+      so the agent never stores the answer addresses as allowed destinations.
+  - id: c
+    text: It is allowed only for the first five minutes.
+    explanation: There is no grace period in the mechanism. Allowed addresses leave
+      the maps when the TTL expires.
+  correct_option: b
+  explanation: Correct. Without a DNS rule the queries do not pass the DNS proxy,
+    so the agent never stores the answer addresses as allowed destinations.
+- id: ats059-010-q05
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Choose the right rule type for an external destination
+  source_readings:
+  - sections/section-010/module-01/course-02-controlling-egress-with-network-policy.md
+  prompt: Which rule matches an external partner at one IPv4 address?
+  options:
+  - id: a
+    text: "`toEndpoints` with the partner address as a label."
+    explanation: "`toEndpoints` selects cluster endpoints by label identity, not external
+      addresses."
+  - id: b
+    text: "`toEntities` with the value `cluster`."
+    explanation: The entity `cluster` means destinations inside the cluster, not the
+      partner.
+  - id: c
+    text: "`toCIDR` with a `/32` prefix."
+    explanation: Correct. `toCIDR` lists destination prefixes outside the cluster,
+      and a single address is a `/32`.
+  correct_option: c
+  explanation: Correct. `toCIDR` lists destination prefixes outside the cluster, and
+    a single address is a `/32`.
+- id: ats059-010-q06
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: Find the failing stage of an outbound connection
+  source_readings:
+  - sections/section-010/module-01/course-03-source-identity-and-return-paths.md
+  prompt: The name resolves, but the connection from `shuttle` hangs, while the same
+    request from `drifter` works. Which stage is the most likely cause?
+  options:
+  - id: a
+    text: A network policy that selects `shuttle` and does not allow the destination.
+    explanation: Correct. The only difference between the two pods is the policy that
+      selects one of them. The drop monitor or Hubble shows the policy verdict.
+  - id: b
+    text: A missing route on the partner for the pod CIDR.
+    explanation: Both pods leave with a node address, so a missing pod route would
+      affect both.
+  - id: c
+    text: A wrong CoreDNS Deployment.
+    explanation: The name already resolves, so DNS works.
+  correct_option: a
+  explanation: Correct. The only difference between the two pods is the policy that
+    selects one of them. The drop monitor or Hubble shows the policy verdict.
+- id: ats059-010-q07
+  type: single_choice
+  difficulty: intermediate
+  learning_objective: State what an egress gateway gives an external allowlist
+  source_readings:
+  - sections/section-010/module-02/course-01-why-a-fixed-source-address.md
+  prompt: The partner allowlist can hold one address. Which design gives it a fixed
+    source address for the `shuttle` pod?
+  options:
+  - id: a
+    text: Adding every node address to the allowlist.
+    explanation: That works but the allowlist then holds many addresses and still
+      changes when nodes change.
+  - id: b
+    text: A `CiliumEgressGatewayPolicy` that selects `shuttle` and names a gateway
+      node and an `egressIP`.
+    explanation: Correct. The policy sends matching traffic through the gateway node,
+      which uses the egress address as source.
+  - id: c
+    text: Adding the `shuttle` pod address to the allowlist.
+    explanation: Pod addresses are temporary and are replaced by masquerading anyway.
+  correct_option: b
+  explanation: Correct. The policy sends matching traffic through the gateway node,
+    which uses the egress address as source.
+- id: ats059-010-q08
+  type: single_choice
+  difficulty: advanced
+  learning_objective: Write a narrow egress gateway policy
+  source_readings:
+  - sections/section-010/module-02/course-02-writing-an-egress-gateway-policy.md
+  prompt: Which `CiliumEgressGatewayPolicy` is narrowest for `shuttle` traffic to
+    the partner?
+  options:
+  - id: a
+    text: 'A `podSelector` that is empty and `destinationCIDRs: [0.0.0.0/0]`.'
+    explanation: An empty selector and a wildcard destination move every pod and every
+      destination through the gateway.
+  - id: b
+    text: A `nodeSelector` only, with no pod selector.
+    explanation: The pod selector is required, and without it the policy has no source
+      to match.
+  - id: c
+    text: A `podSelector` for `shuttle` in `starfleet`, `destinationCIDRs` with the
+      partner `/32`, and a gateway `nodeSelector` with an `egressIP`.
+    explanation: Correct. The pod selector, the destination list and the gateway node
+      together limit which traffic takes the gateway.
+  correct_option: c
+  explanation: Correct. The pod selector, the destination list and the gateway node
+    together limit which traffic takes the gateway.
+- id: ats059-010-q09
+  type: single_choice
+  difficulty: advanced
+  learning_objective: Explain that a gateway policy does not authorize traffic
+  source_readings:
+  - sections/section-010/module-02/course-03-gateway-policy-failures-and-network-policy.md
+  prompt: "`shuttle` matches a `CiliumEgressGatewayPolicy`, and a `CiliumNetworkPolicy`
+    denies its egress. What does the partner see?"
+  options:
+  - id: a
+    text: Nothing. The network policy still drops the connection, because the gateway
+      policy only chooses the source address.
+    explanation: Correct. The gateway policy selects the path and source address.
+      Authorization stays with the network policy.
+  - id: b
+    text: The gateway address, because the gateway policy overrides the network policy.
+    explanation: Neither policy overrides the other, and the connection never leaves
+      the node.
+  - id: c
+    text: The node address of the pod.
+    explanation: The packet is dropped before it can be sent with any source address.
+  correct_option: a
+  explanation: Correct. The gateway policy selects the path and source address. Authorization
+    stays with the network policy.

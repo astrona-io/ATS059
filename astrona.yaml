@@ -1,8 +1,10 @@
+# Playgrounds are not listed: the landing page marker of each module shows them.
 training:
   id: ATS059
   title: 'CCA: BGP and External Networking'
-  description: 'Detailed reading material and reusable YAML knowledge checks for CCA:
-    BGP and External Networking. Technical content remains draft. Private playgrounds and draft independent labs are included.'
+  description: 'Reading, playgrounds, graded labs and quizzes for CCA: BGP and External
+    Networking. Egress policy, the egress gateway, BGP peering and route advertisement
+    with Cilium. Technical content remains draft and labs are untested.'
   certification:
     name: Cilium Certified Associate
     code: CCA
@@ -31,78 +33,229 @@ modules:
     path: sections/intro/course-03-how-this-course-is-made.md
 - id: module-010
   title: Egress Connectivity Requirements
-  description: Developed reading and reasoning for Egress Connectivity Requirements.
-  maturity: alpha
+  description: Trace outbound traffic from pods, control it with policy and give selected
+    pods a fixed source address with the egress gateway.
+  status: alpha
   content:
   - type: reading
     title: Egress Connectivity Requirements
     path: sections/section-010/README.md
   - type: reading
-    title: External Egress, Source Identity And Return Paths
+    title: Trace Outbound Traffic From Pods To External Services
     path: sections/section-010/module-01/course.md
   - type: reading
-    title: External Egress, Source Identity And Return Paths
-    path: sections/section-010/module-01/course-01-external-egress-source-identity-and-return-paths.md
+    title: The Egress Path And Masquerading
+    path: sections/section-010/module-01/course-01-the-egress-path-and-masquerading.md
   - type: reading
-    title: Inspect Egress Source And Node Allocation — Task
+    title: Controlling Egress With Network Policy
+    path: sections/section-010/module-01/course-02-controlling-egress-with-network-policy.md
+  - type: reading
+    title: 'Limit Egress To One External Partner: Task'
     path: sections/section-010/module-01/labs/lab-01/question.md
   - type: lab
-    title: Inspect Egress Source And Node Allocation
+    title: Limit Egress To One External Partner
     path: sections/section-010/module-01/labs/lab-01
     difficulty: intermediate
     estimated_duration: 25m
-    topic: cilium-diagnostics
+    topic: cilium-egress
     task_kind: build
-    learning_goals:
-    - Record source addressing and the enabled control-plane baseline.
     tags:
     - cca
-    - cilium-diagnostics
+    - egress
+    - cilium
+    - cnp
+    - tocidr
+    - dns
+    learning_goals:
+    - Allow one external partner with a /32 toCIDR rule and a DNS rule
+    - Keep every other external destination denied for the pod
+    - Leave pods that no policy selects unaffected
   - type: reading
-    title: Inspect Egress Source And Node Allocation — Solution
+    title: 'Limit Egress To One External Partner: Solution'
     path: sections/section-010/module-01/labs/lab-01/solution.md
   - type: reading
-    title: 'Guided Practice: Inspect Egress Source And Node Allocation'
-    path: sections/section-010/module-01/course-02-guided-practice.md
+    title: Source Identity And Return Paths
+    path: sections/section-010/module-01/course-03-source-identity-and-return-paths.md
   - type: reading
     title: Summary
-    path: sections/section-010/module-01/course-03-summary.md
+    path: sections/section-010/module-01/course-04-summary.md
+  - type: reading
+    title: Give Pods A Fixed Source Address With The Egress Gateway
+    path: sections/section-010/module-02/course.md
+  - type: reading
+    title: Why A Fixed Source Address Matters
+    path: sections/section-010/module-02/course-01-why-a-fixed-source-address.md
+  - type: reading
+    title: Writing An Egress Gateway Policy
+    path: sections/section-010/module-02/course-02-writing-an-egress-gateway-policy.md
+  - type: reading
+    title: 'Give shuttle A Fixed Source Address: Task'
+    path: sections/section-010/module-02/labs/lab-01/question.md
+  - type: lab
+    title: Give shuttle A Fixed Source Address
+    path: sections/section-010/module-02/labs/lab-01
+    difficulty: intermediate
+    estimated_duration: 25m
+    topic: cilium-egress
+    task_kind: build
+    tags:
+    - cca
+    - egress
+    - cilium
+    - egress-gateway
+    - egressip
+    learning_goals:
+    - Write a CiliumEgressGatewayPolicy for one pod, one destination and one gateway
+      node
+    - Show that the partner sees the egress address for the selected pod only
+  - type: reading
+    title: 'Give shuttle A Fixed Source Address: Solution'
+    path: sections/section-010/module-02/labs/lab-01/solution.md
+  - type: reading
+    title: Gateway Failures And Network Policy
+    path: sections/section-010/module-02/course-03-gateway-policy-failures-and-network-policy.md
+  - type: reading
+    title: Summary
+    path: sections/section-010/module-02/course-04-summary.md
+  - type: reading
+    title: 'Capstone: A Restricted Partner Connection With A Fixed Source Address:
+      Task'
+    path: sections/section-010/capstone/labs/lab-01/question.md
+  - type: lab
+    title: 'Capstone: A Restricted Partner Connection With A Fixed Source Address'
+    path: sections/section-010/capstone/labs/lab-01
+    difficulty: advanced
+    estimated_duration: 35m
+    topic: cilium-egress
+    task_kind: build
+    tags:
+    - cca
+    - egress
+    - cilium
+    - cnp
+    - egress-gateway
+    learning_goals:
+    - Combine a narrow network policy and a gateway policy for one partner connection
+    - Check that other external destinations and other pods keep their behavior
+  - type: reading
+    title: 'Capstone: A Restricted Partner Connection With A Fixed Source Address:
+      Solution'
+    path: sections/section-010/capstone/labs/lab-01/solution.md
+  - type: quiz
+    title: 'Knowledge Check: Egress Connectivity Requirements'
+    path: sections/section-010/quiz.yaml
+    pass_score: 70
 - id: module-020
   title: Understand Options to Connect Cilium-managed Clusters with External Networks
-  description: Developed reading and reasoning for Understand Options to Connect Cilium-managed
-    Clusters with External Networks.
-  maturity: alpha
+  description: Peer Cilium nodes with an external router using BGP, advertise pod
+    and Service addresses, and read the connection options.
+  status: alpha
   content:
   - type: reading
     title: Understand Options to Connect Cilium-managed Clusters with External Networks
     path: sections/section-020/README.md
   - type: reading
-    title: BGP Route Advertisement And External Connectivity
+    title: Peer Cilium Nodes With An External Router Using BGP
     path: sections/section-020/module-01/course.md
   - type: reading
-    title: BGP Route Advertisement And External Connectivity
-    path: sections/section-020/module-01/course-01-bgp-route-advertisement-and-external-connectivity.md
+    title: BGP For Kubernetes Engineers
+    path: sections/section-020/module-01/course-01-bgp-for-kubernetes-engineers.md
   - type: reading
-    title: Inspect BGP Control Plane Readiness — Task
+    title: The Cilium BGP Resources
+    path: sections/section-020/module-01/course-02-the-cilium-bgp-resources.md
+  - type: reading
+    title: Bringing Up A Peering Session
+    path: sections/section-020/module-01/course-03-bringing-up-a-peering-session.md
+  - type: reading
+    title: 'Peer The Worker Nodes With The External Router: Task'
     path: sections/section-020/module-01/labs/lab-01/question.md
   - type: lab
-    title: Inspect BGP Control Plane Readiness
+    title: Peer The Worker Nodes With The External Router
     path: sections/section-020/module-01/labs/lab-01
     difficulty: intermediate
-    estimated_duration: 25m
-    topic: cilium-diagnostics
+    estimated_duration: 30m
+    topic: cilium-bgp
     task_kind: build
-    learning_goals:
-    - Record source addressing and the enabled control-plane baseline.
     tags:
     - cca
-    - cilium-diagnostics
+    - bgp
+    - cilium
+    - peering
+    - bgp-control-plane
+    learning_goals:
+    - Create the BGP cluster config and peer config for the worker nodes
+    - Bring both worker sessions to the established state
   - type: reading
-    title: Inspect BGP Control Plane Readiness — Solution
+    title: 'Peer The Worker Nodes With The External Router: Solution'
     path: sections/section-020/module-01/labs/lab-01/solution.md
   - type: reading
-    title: 'Guided Practice: Inspect BGP Control Plane Readiness'
-    path: sections/section-020/module-01/course-02-guided-practice.md
+    title: Summary
+    path: sections/section-020/module-01/course-04-summary.md
+  - type: reading
+    title: Advertise Pod And Service Addresses With BGP And LB IPAM
+    path: sections/section-020/module-02/course.md
+  - type: reading
+    title: Advertising Pod And Service Addresses
+    path: sections/section-020/module-02/course-01-advertising-pod-and-service-addresses.md
+  - type: reading
+    title: Load Balancer Addresses From A Pool
+    path: sections/section-020/module-02/course-02-load-balancer-addresses-from-a-pool.md
+  - type: reading
+    title: 'Advertise The probe Service And The Pod Prefixes: Task'
+    path: sections/section-020/module-02/labs/lab-01/question.md
+  - type: lab
+    title: Advertise The probe Service And The Pod Prefixes
+    path: sections/section-020/module-02/labs/lab-01
+    difficulty: intermediate
+    estimated_duration: 30m
+    topic: cilium-bgp
+    task_kind: build
+    tags:
+    - cca
+    - bgp
+    - cilium
+    - lb-ipam
+    - advertisement
+    learning_goals:
+    - Write a Service advertisement and a pod prefix advertisement
+    - Show the Service address and the pod prefixes in the router table
+  - type: reading
+    title: 'Advertise The probe Service And The Pod Prefixes: Solution'
+    path: sections/section-020/module-02/labs/lab-01/solution.md
+  - type: reading
+    title: Connection Options And Failures
+    path: sections/section-020/module-02/course-03-connection-options-and-failures.md
   - type: reading
     title: Summary
-    path: sections/section-020/module-01/course-03-summary.md
+    path: sections/section-020/module-02/course-04-summary.md
+  - type: reading
+    title: 'Capstone: Publish The probe Service To The External Router: Task'
+    path: sections/section-020/capstone/labs/lab-01/question.md
+  - type: lab
+    title: 'Capstone: Publish The probe Service To The External Router'
+    path: sections/section-020/capstone/labs/lab-01
+    difficulty: advanced
+    estimated_duration: 40m
+    topic: cilium-bgp
+    task_kind: build
+    tags:
+    - cca
+    - bgp
+    - cilium
+    - peering
+    - advertisement
+    - lb-ipam
+    learning_goals:
+    - Peer the nodes, set peer options and publish one Service address
+    - Check that the router learns the Service address and that ClusterIPs stay private
+  - type: reading
+    title: 'Capstone: Publish The probe Service To The External Router: Solution'
+    path: sections/section-020/capstone/labs/lab-01/solution.md
+  - type: quiz
+    title: 'Knowledge Check: BGP Control Plane'
+    path: sections/section-020/quiz.yaml
+    pass_score: 70
+  - type: quiz
+    title: 'Final Knowledge Check: BGP and External Networking'
+    path: sections/final-domain-quiz.yaml
+    pass_score: 70

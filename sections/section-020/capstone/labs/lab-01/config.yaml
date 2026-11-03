@@ -1,0 +1,58 @@
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-059-capstone-020
+  docs:
+    prerequisites: docs/prerequisites.md
+    question: question.md
+    solution: solution.md
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.0@sha256:452d707d4862f52530247495d180205e029056831160e22870e37e3f6c1ac31f
+    nodes:
+      workers: 2
+    networking:
+      disableDefaultCNI: true
+      kubeProxyMode: none
+      podSubnet: 10.244.0.0/16
+bootstrap:
+  init:
+  - name: seed-environment
+    description: Install Cilium, start the external containers and create the workloads
+    type: file
+    source: bootstrap/setup.sh
+testing:
+  init:
+  - name: apply-solution
+    description: Apply the reference solution
+    type: file
+    source: solution/apply.sh
+validation:
+  scripts:
+  - name: sessions-established
+    description: "Both worker nodes report an established BGP session and the control plane node runs no BGP"
+    type: file
+    source: validation/validate-sessions-established.sh
+    hint: "Label only the workers, create a CiliumBGPClusterConfig that selects the label, and use the ASNs and router address from lab-env."
+  - name: peer-options
+    description: "The referenced peer configuration enables graceful restart and uses a hold time of 30 seconds or less"
+    type: file
+    source: validation/validate-peer-options.sh
+    hint: "Set gracefulRestart.enabled to true and holdTimeSeconds to a value of 30 or less in the CiliumBGPPeerConfig."
+  - name: service-address
+    description: "probe-public is a LoadBalancer Service for app=probe with an address from the pool"
+    type: file
+    source: validation/validate-service-address.sh
+    hint: "Create the Service with type LoadBalancer. The pool starfleet-pool assigns the address."
+  - name: router-routes
+    description: "The router has BGP routes for the Service address and the pod prefix of each worker"
+    type: file
+    source: validation/validate-router-routes.sh
+    hint: "Advertise LoadBalancerIP for Services labeled bgp=advertise and PodCIDR, both with the label advertise=bgp, and select the label in the peer configuration family."
+  - name: no-clusterip-advertised
+    description: "No advertisement announces ClusterIP addresses"
+    type: file
+    source: validation/validate-no-clusterip-advertised.sh
+    hint: "List only LoadBalancerIP in service.addresses."
+teardown:
+  keepCluster: false

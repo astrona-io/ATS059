@@ -3,33 +3,31 @@ draft: true
 exam_objectives:
 - Egress Connectivity Requirements
 ---
-# Inspect Egress Source And Node Allocation
+# Limit Egress To One External Partner
 
-Record source addressing and the enabled control-plane baseline.
+The `shuttle` pod in `starfleet` must call the partner service that runs outside the cluster. A security review found that it can reach every external address. Limit it to the partner and nothing else, without breaking name resolution and without affecting other pods.
 
 ## Starting state
 
-Cilium manages the private two-node cluster. Hubble Relay and the BGP control plane are enabled. The probe and two clients are healthy; no learner policy or evidence report exists. This baseline uses kube-proxy and tunnelling.
-
-Use a host shell with the private kubeconfig for this independent kind environment. A kubeconfig identifies the cluster and credentials used by kubectl, the Kubernetes command-line tool.
+A three-node `kind` cluster runs Cilium with eBPF masquerading. The pods `shuttle` (namespace `starfleet`) and `drifter` (namespace `outpost`) run `curl`. Two HTTP services run outside the cluster on port 8080: the partner and a decoy. Their addresses are in the ConfigMap `lab-env` in `starfleet`:
 
 ```sh
-export KUBECONFIG="$(astrona kubeconfig ats-059-lab-010-01-01)"
-test "$(kubectl config current-context)" = "kind-astro-ats-059-lab-010-01-01" || exit 1
-node_name="astro-ats-059-lab-010-01-01-control-plane"
-worker_name="astro-ats-059-lab-010-01-01-worker"
+kubectl -n starfleet get configmap lab-env -o jsonpath='{.data.PARTNER_IP}'
+kubectl -n starfleet get configmap lab-env -o jsonpath='{.data.DECOY_IP}'
 ```
 
-Keep this connection selected. Host-level commands name only this environment's node containers. They do not operate on the host operating system.
+No network policy exists yet.
 
 ## Required result
 
-Record a Pod source address and its node allocation. Egress gateway steering requires additional configuration; this lab inventories the source identity and does not claim a stable external egress IP.
+- `shuttle` reaches the partner on TCP port 8080.
+- `shuttle` cannot reach the decoy or any other external address.
+- `shuttle` still resolves names with the cluster DNS.
+- The partner is allowed by its address as a single `/32` prefix, with a `toCIDR` rule. No wildcard destination (`0.0.0.0/0`, `world` or `all`).
+- `drifter` in `outpost` still reaches external services.
 
-Record observations in `starfleet/evidence`, whose `report.json` contains the stated report. The verifier reads the live API again; invented values do not pass.
+Use a `CiliumNetworkPolicy` in the `starfleet` namespace. Submit when you are done:
 
-The report object uses these fields: `source_ip`, `node`, `node_pod_cidr`, `bgp_enabled`. Keep numeric values numeric and preserve arrays and nested objects returned by the API.
-
-## Verify The Result
-
-The grader checks the required object fields and actual observations. Wait for controller convergence before submitting. Preserve the task's namespace, workload names and unrelated components.
+```sh
+astrona submit -c .
+```

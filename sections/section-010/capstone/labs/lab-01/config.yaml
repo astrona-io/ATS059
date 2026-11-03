@@ -1,0 +1,63 @@
+apiVersion: astrona.io/v1
+metadata:
+  name: ats-059-capstone-010
+  docs:
+    prerequisites: docs/prerequisites.md
+    question: question.md
+    solution: solution.md
+runtime:
+  type: kind
+  kind:
+    image: kindest/node:v1.35.0@sha256:452d707d4862f52530247495d180205e029056831160e22870e37e3f6c1ac31f
+    nodes:
+      workers: 2
+    networking:
+      disableDefaultCNI: true
+      kubeProxyMode: none
+      podSubnet: 10.244.0.0/16
+bootstrap:
+  init:
+  - name: seed-environment
+    description: Install Cilium, start the external containers and create the workloads
+    type: file
+    source: bootstrap/setup.sh
+testing:
+  init:
+  - name: apply-solution
+    description: Apply the reference solution
+    type: file
+    source: solution/apply.sh
+validation:
+  scripts:
+  - name: partner-reachable
+    description: "shuttle reaches the partner on port 8080 with HTTP 200"
+    type: file
+    source: validation/validate-partner-reachable.sh
+    hint: "Allow the partner as a /32 with toCIDR on TCP 8080 in a CiliumNetworkPolicy for app=shuttle."
+  - name: source-is-gateway
+    description: "The partner sees the gateway address for shuttle"
+    type: file
+    source: validation/validate-source-is-gateway.sh
+    hint: "Create a CiliumEgressGatewayPolicy for app=shuttle in starfleet with the partner /32 and egressIP from lab-env."
+  - name: other-external-denied
+    description: "shuttle cannot open a connection to another external address"
+    type: file
+    source: validation/validate-other-external-denied.sh
+    hint: "A CiliumNetworkPolicy with only DNS and the partner rule puts everything else in default deny."
+  - name: dns-allowed
+    description: "shuttle still resolves cluster DNS names"
+    type: file
+    source: validation/validate-dns-allowed.sh
+    hint: "Add a DNS rule for kube-dns on port 53 with a dns matchPattern rule."
+  - name: drifter-unchanged
+    description: "drifter is not restricted and does not use the gateway address"
+    type: file
+    source: validation/validate-drifter-unchanged.sh
+    hint: "Select only app=shuttle in starfleet in both policies."
+  - name: policies-narrow
+    description: "Neither policy uses a wildcard destination"
+    type: file
+    source: validation/validate-policies-narrow.sh
+    hint: "Do not use 0.0.0.0/0, toEntities world or toEntities all."
+teardown:
+  keepCluster: false

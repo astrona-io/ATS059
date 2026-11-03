@@ -3,32 +3,56 @@ metadata:
   name: ats-059-lab-010-01-01
   docs:
     prerequisites: docs/prerequisites.md
-    examQuestion: question.md
-    caseStudy: docs/case-study.md
-    guide: solution.md
+    question: question.md
+    solution: solution.md
 runtime:
   type: kind
   kind:
     image: kindest/node:v1.35.0@sha256:452d707d4862f52530247495d180205e029056831160e22870e37e3f6c1ac31f
     nodes:
-      workers: 1
+      workers: 2
     networking:
       disableDefaultCNI: true
+      kubeProxyMode: none
       podSubnet: 10.244.0.0/16
 bootstrap:
   init:
-  - name: seed-private-environment
+  - name: seed-environment
+    description: Install Cilium, start the external containers and create the workloads
     type: file
     source: bootstrap/setup.sh
-teardown:
-  keepCluster: false
 testing:
   init:
-  - name: reference-result
+  - name: apply-solution
+    description: Apply the reference solution
     type: file
     source: solution/apply.sh
 validation:
-  script:
-    name: verify-fields-and-live-evidence
+  scripts:
+  - name: partner-reachable
+    description: "shuttle reaches the partner on port 8080"
     type: file
-    source: validate.sh
+    source: validation/validate-partner-reachable.sh
+    hint: "Allow the partner address as a /32 with toCIDR and port 8080 TCP."
+  - name: decoy-denied
+    description: "shuttle cannot reach the decoy external service"
+    type: file
+    source: validation/validate-decoy-denied.sh
+    hint: "Once any egress rule selects shuttle, everything not allowed is dropped. Do not allow other external addresses."
+  - name: dns-allowed
+    description: "shuttle still resolves cluster DNS names"
+    type: file
+    source: validation/validate-dns-allowed.sh
+    hint: "Add a rule to the kube-dns pods in kube-system on port 53 with a dns matchPattern rule."
+  - name: policy-uses-cidr
+    description: "A CiliumNetworkPolicy for app=shuttle allows the partner with a /32 toCIDR rule and no wildcard"
+    type: file
+    source: validation/validate-policy-uses-cidr.sh
+    hint: "Create the policy in the starfleet namespace with endpointSelector app=shuttle. Do not use 0.0.0.0/0 or toEntities world."
+  - name: drifter-unaffected
+    description: "drifter in outpost still reaches external services"
+    type: file
+    source: validation/validate-drifter-unaffected.sh
+    hint: "A CiliumNetworkPolicy only affects the pods its endpointSelector selects in its own namespace."
+teardown:
+  keepCluster: false

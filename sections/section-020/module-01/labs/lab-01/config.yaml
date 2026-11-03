@@ -3,32 +3,56 @@ metadata:
   name: ats-059-lab-020-01-01
   docs:
     prerequisites: docs/prerequisites.md
-    examQuestion: question.md
-    caseStudy: docs/case-study.md
-    guide: solution.md
+    question: question.md
+    solution: solution.md
 runtime:
   type: kind
   kind:
     image: kindest/node:v1.35.0@sha256:452d707d4862f52530247495d180205e029056831160e22870e37e3f6c1ac31f
     nodes:
-      workers: 1
+      workers: 2
     networking:
       disableDefaultCNI: true
+      kubeProxyMode: none
       podSubnet: 10.244.0.0/16
 bootstrap:
   init:
-  - name: seed-private-environment
+  - name: seed-environment
+    description: Install Cilium, start the external containers and create the workloads
     type: file
     source: bootstrap/setup.sh
-teardown:
-  keepCluster: false
 testing:
   init:
-  - name: reference-result
+  - name: apply-solution
+    description: Apply the reference solution
     type: file
     source: solution/apply.sh
 validation:
-  script:
-    name: verify-fields-and-live-evidence
+  scripts:
+  - name: cluster-config
+    description: "A CiliumBGPClusterConfig peers with the router address using the correct ASNs"
     type: file
-    source: validate.sh
+    source: validation/validate-cluster-config.sh
+    hint: "Use localASN from BGP_LOCAL_ASN, peerASN from BGP_ROUTER_ASN and peerAddress from ROUTER_IP in the lab-env ConfigMap."
+  - name: peer-config-exists
+    description: "The peerConfigRef of the cluster configuration names an existing CiliumBGPPeerConfig with an ipv4 unicast family"
+    type: file
+    source: validation/validate-peer-config-exists.sh
+    hint: "Create a CiliumBGPPeerConfig and reference its name in peerConfigRef. Add a family with afi ipv4 and safi unicast."
+  - name: workers-select
+    description: "The two worker nodes carry a label that the cluster configuration selects and the control plane node does not"
+    type: file
+    source: validation/validate-workers-select.sh
+    hint: "Label only the worker nodes and use the same key and value in nodeSelector.matchLabels."
+  - name: worker-established
+    description: "The first worker reports an established BGP session"
+    type: file
+    source: validation/validate-worker-established.sh
+    hint: "Check kubectl describe ciliumbgpnodeconfigs for the peering state. A wrong ASN or address keeps the session from establishing."
+  - name: worker2-established
+    description: "The second worker reports an established BGP session"
+    type: file
+    source: validation/validate-worker2-established.sh
+    hint: "Both workers must match the node selector of the cluster configuration."
+teardown:
+  keepCluster: false
