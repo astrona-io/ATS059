@@ -50,7 +50,7 @@ sections:
       path: sections/section-010/module-01/labs/lab-01
       after_reading: sections/section-010/module-01/course-02-controlling-egress-with-network-policy.md
       objective: Allow one external partner with a /32 toCIDR rule and a DNS rule.
-      status: draft
+      status: alpha
       runtime_verification: pending
     practice_readings: []
   - id: module-02
@@ -75,7 +75,7 @@ sections:
       path: sections/section-010/module-02/labs/lab-01
       after_reading: sections/section-010/module-02/course-02-writing-an-egress-gateway-policy.md
       objective: Give one pod the egress address as source for one destination.
-      status: draft
+      status: alpha
       runtime_verification: pending
     practice_readings: []
   - id: module-03
@@ -101,7 +101,7 @@ sections:
       path: sections/section-010/module-03/labs/lab-01
       after_reading: sections/section-010/module-03/course-01-how-a-fqdn-rule-works.md
       objective: Allow one partner by name with a DNS rule and a toFQDNs rule.
-      status: draft
+      status: alpha
       runtime_verification: pending
     practice_readings: []
     quiz: sections/section-010/module-03/quiz.yaml
@@ -128,7 +128,7 @@ sections:
       path: sections/section-010/module-04/labs/lab-01
       after_reading: sections/section-010/module-04/course-01-requirements-and-feature-checks.md
       objective: Move the gateway for one pod to the second worker with a role label.
-      status: draft
+      status: alpha
       runtime_verification: pending
     practice_readings: []
     quiz: sections/section-010/module-04/quiz.yaml
@@ -163,7 +163,7 @@ sections:
       path: sections/section-020/module-01/labs/lab-01
       after_reading: sections/section-020/module-01/course-03-bringing-up-a-peering-session.md
       objective: Peer both worker nodes with the external router.
-      status: draft
+      status: alpha
       runtime_verification: pending
     practice_readings: []
   - id: module-02
@@ -188,7 +188,7 @@ sections:
       path: sections/section-020/module-02/labs/lab-01
       after_reading: sections/section-020/module-02/course-02-load-balancer-addresses-from-a-pool.md
       objective: Advertise the probe Service address and the pod prefixes.
-      status: draft
+      status: alpha
       runtime_verification: pending
     practice_readings: []
   - id: module-03
@@ -214,7 +214,7 @@ sections:
       path: sections/section-020/module-03/labs/lab-01
       after_reading: sections/section-020/module-03/course-01-layer-2-announcements.md
       objective: Announce a LoadBalancer Service with Layer 2 from worker nodes.
-      status: draft
+      status: alpha
       runtime_verification: pending
     practice_readings: []
     quiz: sections/section-020/module-03/quiz.yaml
@@ -242,7 +242,7 @@ sections:
       after_reading: sections/section-020/module-04/course-01-inspecting-sessions-and-routes.md
       objective: Fix the advertisement chain and add a community, verified on the
         router.
-      status: draft
+      status: alpha
       runtime_verification: pending
     practice_readings: []
     quiz: sections/section-020/module-04/quiz.yaml

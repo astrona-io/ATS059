@@ -3,7 +3,7 @@ kind: question_bank
 id: ats059-010
 course_id: ATS059
 exam_code: CCA
-status: draft
+status: alpha
 provenance: Original practice material written for this course; not official exam
   questions.
 scope:
